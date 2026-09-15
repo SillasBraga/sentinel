@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorPage({reset}:{error:Error&{digest?:string};reset:()=>void}){return <main className="grid min-h-screen place-items-center p-6 text-center"><div className="max-w-md"><h1 className="display text-5xl">Algo não saiu como esperado.</h1><p className="mt-5 leading-7 text-[var(--muted)]">Não conseguimos carregar seus dados. Nenhuma informação foi alterada.</p><button onClick={reset} className="mt-7 min-h-12 rounded-full bg-[var(--ink)] px-6 font-bold text-white">Tentar novamente</button></div></main>}

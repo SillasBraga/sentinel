@@ -1,0 +1,61 @@
+name: Relatar um bug
+description: Informe um comportamento incorreto sem incluir dados sensíveis.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Não inclua senhas, tokens, conteúdo do diário ou outros dados pessoais. Vulnerabilidades devem seguir SECURITY.md."
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição
+      description: O que aconteceu e o que deveria acontecer?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: "1. Acesse...\n2. Clique...\n3. Observe..."
+    validations:
+      required: true
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: Ambiente visual
+      options:
+        - Desktop
+        - Mobile
+        - Ambos
+        - Não se aplica
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Tema
+      options:
+        - Claro
+        - Escuro
+        - Ambos
+        - Não se aplica
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Navegador e versão
+      placeholder: Chrome 140
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências anonimizadas
+      description: Logs técnicos ou screenshots sem informações pessoais.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacidade
+      options:
+        - label: Confirmei que este relato não contém dados pessoais, tokens ou chaves.
+          required: true

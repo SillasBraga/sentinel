@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+
+# Next.js and build outputs
+.next/
+out/
+dist/
+build/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Supabase local state
+supabase/.branches/
+supabase/.temp/
+
+# Hosting providers
+.vercel/
+.sites-runtime/
+
+# Caches and generated metadata
+*.tsbuildinfo
+.turbo/
+.eslintcache
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Editors and operating systems
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~

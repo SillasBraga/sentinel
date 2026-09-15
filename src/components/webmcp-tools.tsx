@@ -1,0 +1,7 @@
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+type ToolRegistration = { name:string;title:string;description:string;inputSchema:object;annotations:{readOnlyHint:boolean;untrustedContentHint:boolean};execute:(input:unknown)=>unknown };
+declare global { interface Document { modelContext?: { registerTool(tool:ToolRegistration,options?:{signal:AbortSignal}):void|Promise<void> } } }
+export function WebMCPTools(){const router=useRouter();useEffect(()=>{const context=document.modelContext;if(!context?.registerTool)return;const controller=new AbortController();const register=(tool:ToolRegistration)=>Promise.resolve(context.registerTool(tool,{signal:controller.signal})).catch(()=>undefined);void register({name:"start_sos",title:"Iniciar SOS",description:"Abre imediatamente o protocolo privado de apoio do Sentinel.",inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(){router.push("/app/sos");return{status:"opened"}}});void register({name:"start_daily_checkin",title:"Iniciar check-in",description:"Abre o check-in diário rápido para registrar estado emocional e intensidade do impulso.",inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(){router.push("/app/checkin");return{status:"opened"}}});return()=>controller.abort()},[router]);return null}

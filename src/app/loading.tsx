@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="shell animate-pulse py-16" aria-label="Carregando"><div className="h-4 w-24 rounded bg-black/10"/><div className="mt-5 h-12 w-2/3 rounded-xl bg-black/10"/><div className="mt-10 grid gap-5 md:grid-cols-2"><div className="h-64 rounded-[1.8rem] bg-black/10"/><div className="h-64 rounded-[1.8rem] bg-black/10"/></div></main>}

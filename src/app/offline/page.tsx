@@ -1,0 +1,2 @@
+import { WifiOff } from "lucide-react";
+export default function OfflinePage() { return <main className="grid min-h-screen place-items-center bg-[var(--ink)] p-6 text-center text-white"><div className="max-w-sm"><WifiOff className="mx-auto text-[#71dbc6]" size={42} /><h1 className="display mt-6 text-5xl">Você está offline.</h1><p className="mt-5 leading-7 text-white/60">Assim que a conexão voltar, abra o Sentinel novamente. Por segurança, dados sensíveis não ficam guardados indefinidamente no navegador.</p></div></main>; }
