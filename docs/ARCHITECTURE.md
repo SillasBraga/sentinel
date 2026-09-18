@@ -16,11 +16,15 @@ O Proxy faz somente checagem otimista e atualização de cookies. A autorizaçã
 
 ## Recuperação e analytics
 
-`recovery_profiles.started_at` e `relapse_events` formam o histórico de eventos. Streak atual, recorde e dias alinhados são derivados; uma recaída nunca sobrescreve o histórico. Datas de calendário são convertidas para o fuso do perfil antes do cálculo, evitando dividir milissegundos por 24 horas.
+`recovery_profiles.started_at` e `relapse_events` formam o histórico de eventos. A sequência atual representa dias civis desde o início da jornada ou desde a recaída registrada mais recente; check-ins, impulsos e sessões SOS não a reiniciam. Streak atual, recorde e dias alinhados são derivados, e uma recaída nunca sobrescreve o histórico. Datas de calendário são convertidas para o fuso do perfil antes do cálculo, evitando dividir milissegundos por 24 horas.
 
 O risk engine é uma função pura que soma contribuições explícitas e retorna `{ score, level, factors }`. A interface mostra os fatores e não faz previsões deterministas. Insights exigem amostra mínima.
 
 Após um check-in, o usuário é encaminhado ao resultado explicativo, que relaciona o registro aos indicadores sem prometer causalidade clínica. Inserções, alterações e exclusões usam um contrato compartilhado de resultado e toasts temporários para tornar o estado da operação visível.
+
+Na interface, os registros foram consolidados em dois fluxos principais: **momento** (humor, intensidade do impulso, exposição e contexto, persistido em `daily_checkins`) e **recaída/recomeço** (persistido em `relapse_events`). `urges` permanece como histórico compatível para registros detalhados anteriores e continua entrando nos agregados. O SOS é uma intervenção, não um terceiro formulário de registro; sua sessão é persistida automaticamente e passa a alimentar Início, Progresso e Calendário quando concluída.
+
+O calendário cruza check-ins, conclusões de hábitos, impulsos, sessões SOS, metas e recomeços pelo fuso horário do perfil. A grade mensal é navegável, inclui filtros locais e exibe apenas resumos no detalhe diário; textos íntimos de recaídas, impulsos e diário não são reproduzidos nessa visão agregada.
 
 ## SOS
 
@@ -36,7 +40,7 @@ O service worker nunca armazena respostas privadas de `/app/*`. A página offlin
 
 ## Interface e tema
 
-O shell responsivo concentra navegação, alternância de tema e viewport de toasts. A preferência de tema é aplicada imediatamente no cliente e persistida no perfil do usuário. CSS variables representam superfícies, texto, bordas e acentos para evitar divergências entre claro/escuro; animações devem respeitar `prefers-reduced-motion`.
+O shell responsivo concentra navegação, alternância de tema e viewport de toasts. `Registros` é uma área principal e permanece ativa durante os fluxos de momento, impulso legado e recomeço. Em telas móveis, a barra fixa prioriza Início, Registros, Progresso e SOS; Diário, Perfil e ferramentas secundárias ficam no painel “Mais”. No desktop, a barra lateral reduz espaçamentos conforme a altura disponível para não ocultar ações em notebooks. A preferência de tema é aplicada imediatamente no cliente e persistida no perfil do usuário. CSS variables representam superfícies, texto, bordas e acentos para evitar divergências entre claro/escuro; animações devem respeitar `prefers-reduced-motion`.
 
 ## Evolução
 

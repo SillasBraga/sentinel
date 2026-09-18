@@ -28,7 +28,7 @@ export default async function CheckinResultPage({ searchParams }: { searchParams
 
   return (
     <div className="mx-auto max-w-5xl p-5 py-8 sm:p-8 lg:p-12">
-      <PageHeader eyebrow="Check-in concluído" title="Seu registro já está nos indicadores." description="Veja o que mudou agora e o que ficará disponível para análises futuras." />
+      <PageHeader eyebrow="Momento registrado" title="Seu registro já está nos indicadores." description="Humor, impulso e contexto agora alimentam Início, Progresso e Calendário." />
 
       <section className="mt-8 grid gap-3 rounded-[1.8rem] bg-white p-5 sm:grid-cols-3 sm:p-7">
         <ResultStat label="Estado emocional" value={moods[checkin.mood]} />
@@ -58,7 +58,7 @@ export default async function CheckinResultPage({ searchParams }: { searchParams
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link href="/app/dashboard" className="primary-action inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 font-bold">Ver dashboard atualizado <ArrowRight size={17} /></Link>
-        <Link href="/app/checkin" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[var(--line)] bg-white px-6 font-bold">Editar o check-in de hoje</Link>
+        <Link href="/app/checkin" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[var(--line)] bg-white px-6 font-bold">Editar o momento de hoje</Link>
       </div>
     </div>
   );

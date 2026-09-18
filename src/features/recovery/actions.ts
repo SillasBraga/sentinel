@@ -23,7 +23,9 @@ export async function createCheckin(formData: FormData) {
   const { data, error } = await supabase.from("daily_checkins").upsert({ user_id: user.id, local_date: formatInTimeZone(new Date().toISOString(), profile?.timezone ?? "UTC"), mood: parsed.data.mood, urge_level: parsed.data.urgeLevel, exposure: parsed.data.exposure, situations: parsed.data.situations, small_win: parsed.data.smallWin || null, occurred_at: new Date().toISOString() }, { onConflict: "user_id,local_date" }).select("id").single();
   if (error || !data) redirect(feedback("/app/checkin", "error", "Não foi possível salvar o check-in."));
   revalidatePath("/app/dashboard");
-  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", "Check-in salvo com sucesso."));
+  revalidatePath("/app/progress");
+  revalidatePath("/app/calendar");
+  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", "Momento salvo. Início, Progresso e Calendário foram atualizados."));
 }
 
 const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), alone: z.boolean() });
@@ -36,20 +38,24 @@ export async function createUrge(formData: FormData) {
   const { error } = await supabase.from("urges").insert({ user_id: user.id, intensity: parsed.data.intensity, emotion: parsed.data.emotion, context: parsed.data.context, location_context: parsed.data.location, associated_platform: parsed.data.platform, thought: parsed.data.thought, response_taken: parsed.data.response, alone: parsed.data.alone });
   if (error) redirect(feedback("/app/triggers", "error", "Não foi possível salvar o registro."));
   revalidatePath("/app/dashboard");
+  revalidatePath("/app/progress");
+  revalidatePath("/app/calendar");
   redirect(parsed.data.intensity >= 7 ? feedback("/app/sos?from=urge", "toast", "Registro salvo. O SOS foi aberto para apoiar você agora.") : feedback("/app/triggers", "toast", "Registro de impulso salvo."));
 }
 
-const relapseSchema = z.object({ occurredAt: z.string().datetime({ local: true }), trigger: z.string().max(1000).optional(), context: z.string().max(120).optional(), learning: z.string().max(2000).optional(), nextStep: z.string().max(1000).optional() });
+const relapseSchema = z.object({ occurredAt: z.string().datetime({ local: true }), trigger: z.string().max(1000).optional(), context: z.string().max(120).optional(), learning: z.string().max(2000).optional(), nextStep: z.string().max(1000).optional(), confirmRestart: z.literal("on") }).refine((value) => new Date(value.occurredAt).getTime() <= Date.now() + 60_000, { path: ["occurredAt"], message: "A data da recaída não pode estar no futuro." });
 
 export async function createRelapse(formData: FormData) {
   const user = await requireUser();
-  const parsed = relapseSchema.safeParse({ occurredAt: formData.get("occurredAt"), trigger: formData.get("trigger") || undefined, context: formData.get("context") || undefined, learning: formData.get("learning") || undefined, nextStep: formData.get("nextStep") || undefined });
-  if (!parsed.success) redirect(feedback("/app/relapse", "error", "Revise as informações da recaída."));
+  const parsed = relapseSchema.safeParse({ occurredAt: formData.get("occurredAt"), trigger: formData.get("trigger") || undefined, context: formData.get("context") || undefined, learning: formData.get("learning") || undefined, nextStep: formData.get("nextStep") || undefined, confirmRestart: formData.get("confirmRestart") });
+  if (!parsed.success) redirect(feedback("/app/relapse", "error", "Revise a data e confirme o reinício da sequência."));
   const supabase = await createClient();
   const { error } = await supabase.from("relapse_events").insert({ user_id: user.id, occurred_at: new Date(parsed.data.occurredAt).toISOString(), trigger_summary: parsed.data.trigger, context: parsed.data.context, learning: parsed.data.learning, next_step: parsed.data.nextStep });
   if (error) redirect(feedback("/app/relapse", "error", "Não foi possível salvar o registro."));
   revalidatePath("/app/dashboard");
-  redirect(feedback("/app/progress", "toast", "Registro salvo. Seu progresso anterior continua preservado."));
+  revalidatePath("/app/progress");
+  revalidatePath("/app/calendar");
+  redirect(feedback("/app/progress?relapse=1", "toast", "Recaída registrada. Sua sequência recomeçou e o histórico anterior foi preservado."));
 }
 
 export async function createHabit(formData: FormData) {

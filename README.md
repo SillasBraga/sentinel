@@ -1,6 +1,6 @@
 # Sentinel
 
-Plataforma web e PWA de apoio à recuperação e à construção de hábitos saudáveis. O Sentinel reúne check-ins, indicadores de risco, modo SOS, diário, metas, hábitos e acompanhamento por uma pessoa de confiança em uma experiência discreta e responsiva.
+Plataforma web e PWA de apoio à recuperação e à construção de hábitos saudáveis. O Sentinel reúne registros de momento e recomeço, indicadores de risco, modo SOS, diário, metas, hábitos e acompanhamento por uma pessoa de confiança em uma experiência discreta e responsiva.
 
 > O Sentinel é uma ferramenta de autocuidado e organização pessoal. Ele não substitui atendimento médico, psicológico, psiquiátrico ou serviços de emergência.
 
@@ -9,7 +9,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Autenticação por e-mail e senha, recuperação de senha e link mágico via Supabase Auth.
 - Onboarding e preferências pessoais protegidas por Row Level Security (RLS).
 - Check-in emocional com resultado explicativo e atualização dos indicadores.
-- Dashboard, histórico, calendário, hábitos, metas e diário.
+- Dashboard, calendário histórico navegável, hábitos, metas e diário.
 - Fluxo SOS com pausa guiada de dez minutos.
 - Convite de accountability com compartilhamento mínimo de informações.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.

@@ -7,8 +7,9 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleUserRound,
-  ClipboardCheck,
+  ClipboardPlus,
   Dumbbell,
+  LayoutGrid,
   House,
   LifeBuoy,
   LogOut,
@@ -17,23 +18,24 @@ import {
   MoonStar,
   Sun,
   Target,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { Fragment, Suspense, useState, useTransition } from "react";
+import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 import { logout } from "@/features/auth/actions";
 import { updateTheme } from "@/features/settings/actions";
 import { ToastViewport } from "@/components/toast-viewport";
 
 const nav = [
   { href: "/app/dashboard", label: "Início", icon: House, sos: false },
+  { href: "/app/records", label: "Registros", icon: ClipboardPlus, sos: false },
   { href: "/app/progress", label: "Progresso", icon: ChartNoAxesCombined, sos: false },
   { href: "/app/sos", label: "SOS", icon: LifeBuoy, sos: true },
   { href: "/app/journal", label: "Diário", icon: BookHeart, sos: false },
   { href: "/app/settings", label: "Perfil", icon: CircleUserRound, sos: false },
 ] as const;
-
-const mobileNav = [nav[0], { href: "/app/checkin", label: "Check-in", icon: ClipboardCheck, sos: false }, ...nav.slice(1)] as const;
 
 const tools = [
   { href: "/app/habits", label: "Hábitos", icon: Dumbbell },
@@ -42,9 +44,14 @@ const tools = [
   { href: "/app/protection", label: "Proteção", icon: Shield },
 ] as const;
 
+const mobileNav = nav.filter(({ href }) => ["/app/dashboard", "/app/records", "/app/progress", "/app/sos"].includes(href));
+const moreNav = [...nav.filter(({ href }) => ["/app/journal", "/app/settings"].includes(href)), ...tools];
+
 export function AppShell({ children, discreetMode = false, theme = "light" }: { children: React.ReactNode; discreetMode?: boolean; theme?: "light" | "dark" }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
+  const mobileToolsDialogRef = useRef<HTMLElement>(null);
   const [activeTheme, setActiveTheme] = useState(theme);
   const [isSavingTheme, startThemeTransition] = useTransition();
 
@@ -53,6 +60,39 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
   };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isPrimaryActive = (href: string) => href === "/app/records" ? ["/app/records", "/app/checkin", "/app/triggers", "/app/relapse"].some(isActive) : isActive(href);
+  const moreActive = moreNav.some(({ href }) => isActive(href));
+
+  useEffect(() => {
+    if (!mobileToolsOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousActiveElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.style.overflow = "hidden";
+    const handleDialogKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileToolsOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusableElements = mobileToolsDialogRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if (!focusableElements?.length) return;
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", handleDialogKeyboard);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleDialogKeyboard);
+      previousActiveElement?.focus();
+    };
+  }, [mobileToolsOpen]);
 
   const toggleTheme = () => {
     const previousTheme = activeTheme;
@@ -79,7 +119,7 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
           <span className="absolute -bottom-28 -right-24 size-72 rounded-full bg-[#1f8f83]/10 blur-3xl" />
         </div>
 
-        <div className={`relative flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
+        <div className={`sidebar-brand relative flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
           <Link href="/app/dashboard" aria-label={discreetMode ? "Focus, início" : "Sentinel, início"} className="group flex items-center gap-3 font-bold">
             <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--sidebar-line)] bg-[var(--sidebar-icon-bg)] text-[var(--teal-deep)] shadow-[0_10px_28px_rgba(65,199,174,.12)] transition group-hover:-translate-y-0.5 group-hover:border-[#71dbc6]/45">
               <ShieldCheck size={21} />
@@ -98,13 +138,13 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
 
-        <nav className={`relative mt-12 grid gap-2 ${collapsed ? "justify-items-center" : ""}`} aria-label="Principal">
+        <nav className={`sidebar-main-nav relative mt-12 grid gap-2 ${collapsed ? "justify-items-center" : ""}`} aria-label="Principal">
           {nav.map(({ href, label, icon: Icon, sos }) => {
-            const active = isActive(href);
+            const active = isPrimaryActive(href);
             return (
-              <Fragment key={href}>
               <Link
-                href={href}
+                key={href}
+                href={href as Route}
                 aria-current={active ? "page" : undefined}
                 aria-label={collapsed ? label : undefined}
                 title={collapsed ? label : undefined}
@@ -114,7 +154,7 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
                       ? "bg-gradient-to-r from-[#71dbc6] to-[#43c9b4] text-[var(--ink)] shadow-[0_12px_30px_rgba(65,199,174,.22)]"
                       : "bg-[var(--sidebar-active)] text-[var(--sidebar-text)] shadow-[inset_0_0_0_1px_var(--sidebar-line)]"
                     : sos
-                      ? "mt-3 bg-[#71dbc6]/90 text-[var(--ink)] hover:bg-[#7ee5d0]"
+                      ? "bg-[#71dbc6]/90 text-[var(--ink)] hover:bg-[#7ee5d0]"
                       : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
                 }`}
               >
@@ -122,31 +162,18 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
                 <Icon size={20} className={`shrink-0 transition-transform duration-300 group-hover:scale-110 ${active ? "scale-105" : ""}`} />
                 {!collapsed && <span className="sidebar-label">{label}</span>}
               </Link>
-              {href === "/app/dashboard" && (
-                <Link
-                  href="/app/checkin"
-                  aria-current={isActive("/app/checkin") ? "page" : undefined}
-                  aria-label={collapsed ? "Fazer check-in" : undefined}
-                  title={collapsed ? "Fazer check-in" : undefined}
-                  className={`desktop-subnav group flex min-h-9 items-center rounded-xl text-xs font-bold transition ${collapsed ? "w-10 justify-center" : "ml-5 gap-2 px-4"} ${isActive("/app/checkin") ? "bg-[var(--sidebar-active)] text-[var(--sidebar-accent)]" : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"}`}
-                >
-                  <ClipboardCheck size={16} />
-                  {!collapsed && <span className="sidebar-label">Fazer check-in</span>}
-                </Link>
-              )}
-              </Fragment>
             );
           })}
         </nav>
 
-        <nav className={`relative mt-7 grid gap-1 border-t border-[var(--sidebar-line)] pt-6 ${collapsed ? "justify-items-center" : ""}`} aria-label="Ferramentas">
+        <nav className={`sidebar-tools-nav relative mt-7 grid gap-2 border-t border-[var(--sidebar-line)] pt-6 ${collapsed ? "justify-items-center" : ""}`} aria-label="Ferramentas">
           {!collapsed && <span className="sidebar-label mb-2 px-4 text-[11px] font-bold uppercase tracking-[.16em] text-[var(--sidebar-faint)]">Ferramentas</span>}
           {tools.map(({ href, label, icon: Icon }) => {
             const active = isActive(href);
             return (
               <Link
                 key={href}
-                href={href}
+                href={href as Route}
                 aria-current={active ? "page" : undefined}
                 aria-label={collapsed ? label : undefined}
                 title={collapsed ? label : undefined}
@@ -159,7 +186,7 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
           })}
         </nav>
 
-        <form action={logout} className={`relative mt-auto shrink-0 ${collapsed ? "flex justify-center" : ""}`}>
+        <form action={logout} className={`sidebar-logout relative mt-auto shrink-0 ${collapsed ? "flex justify-center" : ""}`}>
           <button
             aria-label={collapsed ? "Sair" : undefined}
             title={collapsed ? "Sair" : undefined}
@@ -186,13 +213,49 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
         <div key={pathname} className="route-enter min-h-screen">{children}</div>
       </main>
 
-      <nav className="mobile-nav fixed inset-x-4 bottom-[calc(.65rem+env(safe-area-inset-bottom))] z-40 grid h-[66px] grid-cols-6 overflow-hidden rounded-[1.5rem] border border-[#cfe2dc] bg-[#f9fcfa]/92 p-1.5 shadow-[0_14px_42px_rgba(7,25,28,.18),inset_0_1px_0_rgba(255,255,255,.95)] ring-1 ring-white/60 backdrop-blur-2xl lg:hidden" aria-label="Principal">
+      {mobileToolsOpen && (
+        <div className="mobile-tools-layer lg:hidden">
+          <button type="button" className="mobile-tools-backdrop" aria-label="Fechar menu de ferramentas" onClick={() => setMobileToolsOpen(false)} />
+          <section ref={mobileToolsDialogRef} className="mobile-tools-sheet" role="dialog" aria-modal="true" aria-labelledby="mobile-tools-title">
+            <header className="mobile-tools-header">
+              <div>
+                <p className="eyebrow">Navegação</p>
+                <h2 id="mobile-tools-title">Mais opções</h2>
+              </div>
+              <button type="button" className="mobile-tools-close" aria-label="Fechar menu" autoFocus onClick={() => setMobileToolsOpen(false)}>
+                <X size={20} />
+              </button>
+            </header>
+            <div className="mobile-tools-grid">
+              {moreNav.map(({ href, label, icon: Icon }) => {
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href as Route}
+                    aria-current={active ? "page" : undefined}
+                    className="mobile-tool-link"
+                    data-active={active}
+                    onClick={() => setMobileToolsOpen(false)}
+                  >
+                    <span><Icon size={21} /></span>
+                    <strong>{label}</strong>
+                  </Link>
+                );
+              })}
+            </div>
+            <p className="mobile-tools-note">Use Registros para anotar um momento ou iniciar um recomeço.</p>
+          </section>
+        </div>
+      )}
+
+      <nav className="mobile-nav fixed inset-x-3 bottom-[calc(.55rem+env(safe-area-inset-bottom))] z-40 grid h-[64px] grid-cols-5 overflow-hidden rounded-[1.4rem] border border-[#cfe2dc] bg-[#f9fcfa]/92 p-1.5 shadow-[0_14px_42px_rgba(7,25,28,.18),inset_0_1px_0_rgba(255,255,255,.95)] ring-1 ring-white/60 backdrop-blur-2xl lg:hidden" aria-label="Principal">
         {mobileNav.map(({ href, label, icon: Icon, sos }) => {
-          const active = isActive(href);
+          const active = isPrimaryActive(href);
           return (
             <Link
               key={href}
-              href={href}
+              href={href as Route}
               aria-current={active ? "page" : undefined}
               aria-label={label}
               title={label}
@@ -205,6 +268,17 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
             </Link>
           );
         })}
+        <button
+          type="button"
+          aria-label="Mais ferramentas"
+          aria-expanded={mobileToolsOpen}
+          className={`mobile-nav-item group relative grid min-h-0 place-items-center overflow-hidden rounded-[1.1rem] transition-colors duration-300 ${moreActive || mobileToolsOpen ? "text-[var(--ink)]" : "text-[var(--muted)]"}`}
+          onClick={() => setMobileToolsOpen((current) => !current)}
+        >
+          {(moreActive || mobileToolsOpen) && <span className="nav-orb absolute inset-1 rounded-[.95rem] bg-gradient-to-br from-[#dff8f1] via-[#c9efe6] to-[#afe5d9] shadow-[inset_0_1px_0_rgba(255,255,255,.55),0_6px_18px_rgba(65,199,174,.2)]" />}
+          <LayoutGrid size={moreActive || mobileToolsOpen ? 24 : 22} strokeWidth={moreActive || mobileToolsOpen ? 2.35 : 2} className={`relative z-10 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] ${moreActive || mobileToolsOpen ? "-translate-y-0.5 scale-110" : "group-hover:-translate-y-0.5 group-hover:text-[var(--teal-deep)]"}`} />
+          {(moreActive || mobileToolsOpen) && <span className="nav-dot absolute bottom-1.5 z-10 h-[3px] w-4 rounded-full bg-gradient-to-r from-[#137c6d] to-[#41c7ae]" />}
+        </button>
       </nav>
       <Suspense fallback={null}><ToastViewport /></Suspense>
     </div>
