@@ -5,6 +5,8 @@ import { calculateAlignedDaysRate, calculateAverageUrge, calculateCurrentStreak,
 import { formatInTimeZone } from "@/lib/analytics/timezone";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { PrivateMilestonesCard } from "@/components/private-milestones-card";
+import { isPrivateMilestoneId } from "@/lib/private-milestones";
 
 type IntensityRecord = { intensity: number; date: string };
 
@@ -12,13 +14,14 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
   const user = await requireUser();
   const supabase = await createClient();
   const params = await searchParams;
-  const [profile, recovery, relapses, checkins, urges, sos] = await Promise.all([
+  const [profile, recovery, relapses, checkins, urges, sos, earnedMilestones] = await Promise.all([
     supabase.from("profiles").select("timezone").eq("id", user.id).single(),
     supabase.from("recovery_profiles").select("started_at").eq("user_id", user.id).single(),
     supabase.from("relapse_events").select("occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }),
     supabase.from("daily_checkins").select("urge_level,local_date,occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("urges").select("intensity,occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("sos_sessions").select("started_at,initial_intensity,final_intensity").eq("user_id", user.id).eq("completed", true).not("final_intensity", "is", null),
+    supabase.from("user_achievements").select("achievement_id,earned_at").eq("user_id", user.id).order("earned_at", { ascending: false }),
   ]);
   const now = new Date();
   const timezone = profile.data?.timezone ?? "America/Sao_Paulo";
@@ -68,6 +71,8 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
       <Summary label="Sessões SOS · 30 dias" value={recentSos} />
       <Summary label="Recomeços · 30 dias" value={recentRestarts} />
     </section>
+
+    <PrivateMilestonesCard milestones={(earnedMilestones.data ?? []).filter((item) => isPrivateMilestoneId(item.achievement_id))} />
 
     <section className="mt-6 rounded-[1.8rem] bg-white p-6 sm:p-8">
       <h2 className="text-xl font-bold">Registros de momento · 7 dias</h2>

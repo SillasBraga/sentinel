@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import { formatInTimeZone } from "@/lib/analytics/timezone";
 import { updateDailyMission } from "@/features/daily-missions/service";
 import { awardPresenceXp } from "@/features/presence-xp/service";
+import { awardPrivateMilestones } from "@/features/milestones/service";
+import type { PrivateMilestoneId } from "@/lib/private-milestones";
 
 function feedback(path: string, type: "toast" | "error", message: string): Route {
   return `${path}${path.includes("?") ? "&" : "?"}${type}=${encodeURIComponent(message)}` as Route;
@@ -16,6 +18,10 @@ function feedback(path: string, type: "toast" | "error", message: string): Route
 
 function withLevelUp(path: Route, level?: number): Route {
   return level ? `${path}${path.includes("?") ? "&" : "?"}levelUp=${level}` as Route : path;
+}
+
+function withMilestones(path: Route, milestoneIds: PrivateMilestoneId[]): Route {
+  return milestoneIds.length ? `${path}${path.includes("?") ? "&" : "?"}milestone=${milestoneIds.join(",")}` as Route : path;
 }
 
 const checkinSchema = z.object({ mood: z.coerce.number().int().min(1).max(5), urgeLevel: z.coerce.number().int().min(0).max(10), exposure: z.enum(["none", "light", "moderate", "strong"]), situations: z.array(z.string()).max(8), smallWin: z.string().trim().max(500).optional() });
@@ -34,10 +40,11 @@ export async function createCheckin(formData: FormData) {
   if (!mission.success) redirect(feedback(`/app/checkin/result?id=${data.id}`, "error", "Momento salvo, mas não foi possível atualizar as missões."));
   const xp = await awardPresenceXp("checkin", localDate);
   if (!xp.success) redirect(feedback(`/app/checkin/result?id=${data.id}`, "error", "Momento salvo, mas não foi possível registrar o XP."));
+  const milestones = await awardPrivateMilestones();
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");
   revalidatePath("/app/calendar");
-  redirect(withLevelUp(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : `Momento salvo. Missões de hoje atualizadas.${xp.awarded ? " +15 XP." : ""}`), xp.levelUp ? xp.level : undefined));
+  redirect(withMilestones(withLevelUp(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : `Momento salvo. Missões de hoje atualizadas.${xp.awarded ? " +15 XP." : ""}`), xp.levelUp ? xp.level : undefined), milestones.success ? milestones.milestoneIds : []));
 }
 
 const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), alone: z.boolean() });
@@ -64,10 +71,11 @@ export async function createRelapse(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("relapse_events").insert({ user_id: user.id, occurred_at: new Date(parsed.data.occurredAt).toISOString(), trigger_summary: parsed.data.trigger, context: parsed.data.context, learning: parsed.data.learning, next_step: parsed.data.nextStep });
   if (error) redirect(feedback("/app/relapse", "error", "Não foi possível salvar o registro."));
+  const milestones = await awardPrivateMilestones();
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");
   revalidatePath("/app/calendar");
-  redirect(feedback("/app/progress?relapse=1", "toast", "Recaída registrada. Sua sequência recomeçou e o histórico anterior foi preservado."));
+  redirect(withMilestones(feedback("/app/progress?relapse=1", "toast", "Recaída registrada. Sua sequência recomeçou e o histórico anterior foi preservado."), milestones.success ? milestones.milestoneIds : []));
 }
 
 export async function createHabit(formData: FormData) {

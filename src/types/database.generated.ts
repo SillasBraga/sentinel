@@ -1003,6 +1003,12 @@ export type Database = {
         Args: { p_source: string; p_source_key: string }
         Returns: boolean
       }
+      award_private_milestones: {
+        Args: never
+        Returns: {
+          achievement_id: string
+        }[]
+      }
       complete_onboarding: {
         Args: { p_payload: Json; p_user_id: string }
         Returns: undefined

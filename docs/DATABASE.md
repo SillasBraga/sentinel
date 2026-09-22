@@ -30,6 +30,8 @@ O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e r
 
 `presence_xp_events` registra créditos de XP sem políticas de `update` ou `delete`. `award_presence_xp` valida que o evento de origem pertence ao usuário autenticado, define o valor permitido e usa uma chave única por fonte, impedindo crédito repetido ou arbitrário. XP é acumulativo e não é afetado por recaídas.
 
+`user_achievements` preserva marcos privados uma única vez por usuário e marco. `award_private_milestones` usa apenas `auth.uid()` e dados do próprio usuário para avaliar os critérios; clientes não podem inserir marcos diretamente. O catálogo inicial celebra check-ins, presença, SOS e recomeços, sem comparação entre pessoas.
+
 ## Tipos gerados
 
 `src/types/database.generated.ts` representa o schema que o TypeScript conhece. Sempre regenere após alterar o banco. Não edite o arquivo manualmente.
