@@ -27,6 +27,7 @@ import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 import { logout } from "@/features/auth/actions";
 import { updateTheme } from "@/features/settings/actions";
 import { ToastViewport } from "@/components/toast-viewport";
+import { LevelUpViewport } from "@/components/level-up-viewport";
 
 const nav = [
   { href: "/app/dashboard", label: "Início", icon: House, sos: false },
@@ -281,6 +282,7 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
         </button>
       </nav>
       <Suspense fallback={null}><ToastViewport /></Suspense>
+      <Suspense fallback={null}><LevelUpViewport /></Suspense>
     </div>
   );
 }

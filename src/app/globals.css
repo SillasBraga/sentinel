@@ -806,6 +806,42 @@ label:has(> input[type="radio"]:checked) {
 .modal-layer[data-theme="dark"] .modal-close:hover { background: rgba(255, 255, 255, .07); color: #edf8f5; }
 .modal-layer[data-theme="dark"] .modal-strong { color: #edf8f5; }
 
+.level-up-layer {
+  position: fixed;
+  z-index: 160;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(4, 18, 20, .62);
+  backdrop-filter: blur(10px);
+}
+
+.level-up-card {
+  position: relative;
+  width: min(28rem, 100%);
+  overflow: hidden;
+  padding: 2.5rem;
+  border: 1px solid rgba(65, 199, 174, .42);
+  border-radius: 2rem;
+  background: linear-gradient(145deg, #f7fffc, #dff8f1);
+  box-shadow: 0 30px 95px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .95);
+  animation: level-up-enter .42s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.level-up-close { position: absolute; top: 1rem; right: 1rem; display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid var(--line); border-radius: .8rem; color: var(--muted); }
+.level-up-sparkles { display: flex; align-items: center; gap: .8rem; color: var(--teal-deep); }
+.level-up-sparkles svg:nth-child(1) { animation: level-up-sparkle 1.5s ease-in-out infinite; }
+.level-up-sparkles svg:nth-child(2) { animation: level-up-sparkle 1.5s .22s ease-in-out infinite; }
+.level-up-sparkles svg:nth-child(3) { animation: level-up-sparkle 1.5s .44s ease-in-out infinite; }
+.app-surface[data-theme="dark"] .level-up-card { border-color: rgba(113, 219, 198, .4); background: linear-gradient(145deg, #143a3a, #10292b); color: #edf8f5; box-shadow: 0 30px 95px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .08); }
+.app-surface[data-theme="dark"] .level-up-close:hover { background: rgba(255, 255, 255, .08); color: #edf8f5; }
+
+@keyframes level-up-enter { from { opacity: 0; translate: 0 20px; scale: .94; } to { opacity: 1; translate: 0; scale: 1; } }
+@keyframes level-up-sparkle { 50% { translate: 0 -5px; scale: 1.12; } }
+
+@media (prefers-reduced-motion: reduce) { .level-up-card, .level-up-sparkles svg { animation: none; } }
+
 @keyframes modal-backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modal-card-enter {
   from { opacity: 0; translate: 0 14px; scale: .965; }

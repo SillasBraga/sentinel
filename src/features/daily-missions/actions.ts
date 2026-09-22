@@ -13,6 +13,10 @@ function feedback(path: string, type: "toast" | "error", message: string): Route
   return `${path}${path.includes("?") ? "&" : "?"}${type}=${encodeURIComponent(message)}` as Route;
 }
 
+function withLevelUp(path: Route, level?: number): Route {
+  return level ? `${path}${path.includes("?") ? "&" : "?"}levelUp=${level}` as Route : path;
+}
+
 export async function completeProtectionMission() {
   const user = await requireUser();
   const supabase = await createClient();
@@ -24,5 +28,5 @@ export async function completeProtectionMission() {
   const xp = await awardPresenceXp("protection", localDate);
   if (!xp.success) redirect(feedback("/app/dashboard", "error", "Power-up concluído, mas não foi possível registrar o XP."));
   revalidatePath("/app/dashboard");
-  redirect(feedback("/app/dashboard", "toast", result.summary.isComplete ? "Missões de hoje concluídas. Um passo de cada vez." : `Power-up de proteção concluído.${xp.awarded ? " +10 XP." : ""}`));
+  redirect(withLevelUp(feedback("/app/dashboard", "toast", result.summary.isComplete ? "Missões de hoje concluídas. Um passo de cada vez." : `Power-up de proteção concluído.${xp.awarded ? " +10 XP." : ""}`), xp.levelUp ? xp.level : undefined));
 }

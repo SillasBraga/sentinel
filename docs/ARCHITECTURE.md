@@ -30,7 +30,7 @@ O calendário cruza check-ins, conclusões de hábitos, impulsos, sessões SOS, 
 
 As missões diárias usam `daily_missions`, indexada por usuário e data civil no fuso do perfil. Check-in e primeira conclusão de hábito do dia sincronizam o estado automaticamente; o power-up de proteção é uma confirmação explícita do usuário. A conclusão não altera a sequência de recuperação nem compartilha dados com accountability.
 
-XP de presença é um histórico imutável em `presence_xp_events`: check-in rende 15 XP, hábito 10, SOS concluído 20, reflexão no diário 10, power-up de proteção 10 e meta concluída 25. Uma função SQL valida a propriedade do evento de origem e aplica cada crédito uma única vez. O nível é `floor(XP / 100) + 1`; a barra mostra o restante até 100 XP. Recaídas não alteram esse histórico.
+XP de presença é um histórico imutável em `presence_xp_events`: check-in rende 15 XP, hábito 10, SOS concluído 20, reflexão no diário 10, power-up de proteção 10 e meta concluída 25. Uma função SQL valida a propriedade do evento de origem e aplica cada crédito uma única vez. O desafio cresce a cada nível: nível 1 exige 100 XP, nível 2 exige 200 XP, nível 3 exige 300 XP, e assim sucessivamente. Ao alcançar um novo nível, o shell protegido mostra uma celebração em qualquer tela; recaídas não alteram esse histórico.
 
 ## SOS
 
