@@ -497,6 +497,41 @@ export type Database = {
           },
         ]
       }
+      presence_xp_events: {
+        Row: {
+          earned_at: string
+          id: string
+          points: number
+          source: string
+          source_key: string
+          user_id: string
+        }
+        Insert: {
+          earned_at?: string
+          id?: string
+          points: number
+          source: string
+          source_key: string
+          user_id: string
+        }
+        Update: {
+          earned_at?: string
+          id?: string
+          points?: number
+          source?: string
+          source_key?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presence_xp_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       privacy_preferences: {
         Row: {
           browser_notifications: boolean
@@ -963,6 +998,10 @@ export type Database = {
       accountability_partner_snapshot: {
         Args: { p_relationship_id: string }
         Returns: Json
+      }
+      award_presence_xp: {
+        Args: { p_source: string; p_source_key: string }
+        Returns: boolean
       }
       complete_onboarding: {
         Args: { p_payload: Json; p_user_id: string }

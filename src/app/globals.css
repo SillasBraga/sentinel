@@ -795,12 +795,14 @@ label:has(> input[type="radio"]:checked) {
   box-shadow: 0 30px 95px rgba(0, 0, 0, .48), inset 0 1px 0 rgba(255, 255, 255, .07);
 }
 
-.modal-layer[data-theme="dark"] :where(input, select) {
+.modal-layer[data-theme="dark"] :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
   border-color: rgba(225, 247, 241, .13);
   background-color: #0b2022;
   color: #edf8f5;
 }
 
+.modal-layer[data-theme="dark"] :where(input, textarea)::placeholder { color: #78938e; }
+.modal-layer[data-theme="dark"] textarea:focus-visible { border-color: #71dbc6; box-shadow: 0 0 0 4px rgba(113, 219, 198, .18); }
 .modal-layer[data-theme="dark"] .modal-close:hover { background: rgba(255, 255, 255, .07); color: #edf8f5; }
 .modal-layer[data-theme="dark"] .modal-strong { color: #edf8f5; }
 

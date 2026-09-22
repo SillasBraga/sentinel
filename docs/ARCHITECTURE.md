@@ -24,9 +24,13 @@ Após um check-in, o usuário é encaminhado ao resultado explicativo, que relac
 
 Na interface, os registros foram consolidados em dois fluxos principais: **momento** (humor, intensidade do impulso, exposição e contexto, persistido em `daily_checkins`) e **recaída/recomeço** (persistido em `relapse_events`). `urges` permanece como histórico compatível para registros detalhados anteriores e continua entrando nos agregados. O SOS é uma intervenção, não um terceiro formulário de registro; sua sessão é persistida automaticamente e passa a alimentar Início, Progresso e Calendário quando concluída.
 
+Entradas do diário são privadas e podem ser editadas ou excluídas pelo proprietário, sempre com confirmação antes da exclusão. O XP de reflexão, se já concedido, permanece como histórico de presença e não é removido ao alterar ou excluir a nota.
+
 O calendário cruza check-ins, conclusões de hábitos, impulsos, sessões SOS, metas e recomeços pelo fuso horário do perfil. A grade mensal é navegável, inclui filtros locais e exibe apenas resumos no detalhe diário; textos íntimos de recaídas, impulsos e diário não são reproduzidos nessa visão agregada.
 
 As missões diárias usam `daily_missions`, indexada por usuário e data civil no fuso do perfil. Check-in e primeira conclusão de hábito do dia sincronizam o estado automaticamente; o power-up de proteção é uma confirmação explícita do usuário. A conclusão não altera a sequência de recuperação nem compartilha dados com accountability.
+
+XP de presença é um histórico imutável em `presence_xp_events`: check-in rende 15 XP, hábito 10, SOS concluído 20, reflexão no diário 10, power-up de proteção 10 e meta concluída 25. Uma função SQL valida a propriedade do evento de origem e aplica cada crédito uma única vez. O nível é `floor(XP / 100) + 1`; a barra mostra o restante até 100 XP. Recaídas não alteram esse histórico.
 
 ## SOS
 

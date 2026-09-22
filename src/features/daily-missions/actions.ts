@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatInTimeZone } from "@/lib/analytics/timezone";
 import { updateDailyMission } from "@/features/daily-missions/service";
+import { awardPresenceXp } from "@/features/presence-xp/service";
 
 function feedback(path: string, type: "toast" | "error", message: string): Route {
   return `${path}${path.includes("?") ? "&" : "?"}${type}=${encodeURIComponent(message)}` as Route;
@@ -20,6 +21,8 @@ export async function completeProtectionMission() {
   const result = await updateDailyMission(user.id, localDate, { protectionCompleted: true });
 
   if (!result.success) redirect(feedback("/app/dashboard", "error", "Não foi possível registrar o power-up de hoje."));
+  const xp = await awardPresenceXp("protection", localDate);
+  if (!xp.success) redirect(feedback("/app/dashboard", "error", "Power-up concluído, mas não foi possível registrar o XP."));
   revalidatePath("/app/dashboard");
-  redirect(feedback("/app/dashboard", "toast", result.summary.isComplete ? "Missões de hoje concluídas. Um passo de cada vez." : "Power-up de proteção concluído."));
+  redirect(feedback("/app/dashboard", "toast", result.summary.isComplete ? "Missões de hoje concluídas. Um passo de cada vez." : `Power-up de proteção concluído.${xp.awarded ? " +10 XP." : ""}`));
 }

@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatInTimeZone } from "@/lib/analytics/timezone";
 import { updateDailyMission } from "@/features/daily-missions/service";
+import { awardPresenceXp } from "@/features/presence-xp/service";
 
 function feedback(path: string, type: "toast" | "error", message: string): Route {
   return `${path}${path.includes("?") ? "&" : "?"}${type}=${encodeURIComponent(message)}` as Route;
@@ -27,10 +28,12 @@ export async function createCheckin(formData: FormData) {
   if (error || !data) redirect(feedback("/app/checkin", "error", "Não foi possível salvar o check-in."));
   const mission = await updateDailyMission(user.id, localDate, { checkinCompleted: true });
   if (!mission.success) redirect(feedback(`/app/checkin/result?id=${data.id}`, "error", "Momento salvo, mas não foi possível atualizar as missões."));
+  const xp = await awardPresenceXp("checkin", localDate);
+  if (!xp.success) redirect(feedback(`/app/checkin/result?id=${data.id}`, "error", "Momento salvo, mas não foi possível registrar o XP."));
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");
   revalidatePath("/app/calendar");
-  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : "Momento salvo. Missões de hoje atualizadas."));
+  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : `Momento salvo. Missões de hoje atualizadas.${xp.awarded ? " +15 XP." : ""}`));
 }
 
 const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), alone: z.boolean() });
@@ -92,9 +95,11 @@ export async function toggleHabit(formData: FormData) {
   const { count, error: countError } = await supabase.from("habit_logs").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("local_date", date.data);
   const mission = countError ? { success: false as const } : await updateDailyMission(user.id, date.data, { habitCompleted: (count ?? 0) > 0 });
   if (!mission.success) redirect(feedback("/app/habits", "error", "Hábito atualizado, mas não foi possível atualizar as missões."));
+  const xp = data ? { success: true as const, awarded: false } : await awardPresenceXp("habit", `${id.data}:${date.data}`);
+  if (!xp.success) redirect(feedback("/app/habits", "error", "Hábito atualizado, mas não foi possível registrar o XP."));
   revalidatePath("/app/habits");
   revalidatePath("/app/dashboard");
-  redirect(feedback("/app/habits", "toast", mission.summary.isComplete ? "Hábito concluído. Missões de hoje concluídas." : data ? "Conclusão do hábito desmarcada." : "Hábito concluído hoje. Missões atualizadas."));
+  redirect(feedback("/app/habits", "toast", mission.summary.isComplete ? "Hábito concluído. Missões de hoje concluídas." : data ? "Conclusão do hábito desmarcada." : `Hábito concluído hoje. Missões atualizadas.${xp.awarded ? " +10 XP." : ""}`));
 }
 
 export async function createJournalEntry(formData: FormData) {
@@ -102,10 +107,37 @@ export async function createJournalEntry(formData: FormData) {
   const body = z.string().trim().min(1).max(10000).safeParse(formData.get("body"));
   if (!body.success) redirect(feedback("/app/journal", "error", "Escreva uma nota antes de salvar."));
   const supabase = await createClient();
-  const { error } = await supabase.from("journal_entries").insert({ user_id: user.id, title: String(formData.get("title") || "").slice(0, 140) || null, body: body.data });
-  if (error) redirect(feedback("/app/journal", "error", "Não foi possível salvar a nota."));
+  const { data, error } = await supabase.from("journal_entries").insert({ user_id: user.id, title: String(formData.get("title") || "").slice(0, 140) || null, body: body.data }).select("id").single();
+  if (error || !data) redirect(feedback("/app/journal", "error", "Não foi possível salvar a nota."));
+  const xp = await awardPresenceXp("reflection", data.id);
+  if (!xp.success) redirect(feedback("/app/journal", "error", "Nota salva, mas não foi possível registrar o XP."));
   revalidatePath("/app/journal");
-  redirect(feedback("/app/journal", "toast", "Nota salva no seu diário privado."));
+  revalidatePath("/app/dashboard");
+  redirect(feedback("/app/journal", "toast", `Nota salva no seu diário privado.${xp.awarded ? " +10 XP." : ""}`));
+}
+
+const journalEntrySchema = z.object({ id: z.uuid(), title: z.string().trim().max(140).optional(), body: z.string().trim().min(1).max(10000) });
+
+export async function updateJournalEntry(formData: FormData) {
+  const user = await requireUser();
+  const parsed = journalEntrySchema.safeParse({ id: formData.get("journalId"), title: formData.get("title") || undefined, body: formData.get("body") });
+  if (!parsed.success) redirect(feedback("/app/journal", "error", "Revise o título e o texto antes de salvar."));
+  const supabase = await createClient();
+  const { error } = await supabase.from("journal_entries").update({ title: parsed.data.title ?? null, body: parsed.data.body, updated_at: new Date().toISOString() }).eq("id", parsed.data.id).eq("user_id", user.id);
+  if (error) redirect(feedback("/app/journal", "error", "Não foi possível atualizar a nota."));
+  revalidatePath("/app/journal");
+  redirect(feedback("/app/journal", "toast", "Nota atualizada no seu diário privado."));
+}
+
+export async function deleteJournalEntry(formData: FormData) {
+  const user = await requireUser();
+  const id = z.uuid().safeParse(formData.get("journalId"));
+  if (!id.success) redirect(feedback("/app/journal", "error", "Nota inválida."));
+  const supabase = await createClient();
+  const { error } = await supabase.from("journal_entries").delete().eq("id", id.data).eq("user_id", user.id);
+  if (error) redirect(feedback("/app/journal", "error", "Não foi possível excluir a nota."));
+  revalidatePath("/app/journal");
+  redirect(feedback("/app/journal", "toast", "Nota excluída. O XP já conquistado foi preservado."));
 }
 
 export async function addPlanItem(formData: FormData) {
@@ -144,8 +176,11 @@ export async function toggleGoal(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("goals").update({ completed_at: done ? null : new Date().toISOString() }).eq("id", id.data).eq("user_id", user.id);
   if (error) redirect(feedback("/app/goals", "error", "Não foi possível atualizar a meta."));
+  const xp = done ? { success: true as const, awarded: false } : await awardPresenceXp("goal", id.data);
+  if (!xp.success) redirect(feedback("/app/goals", "error", "Meta concluída, mas não foi possível registrar o XP."));
   revalidatePath("/app/goals");
-  redirect(feedback("/app/goals", "toast", done ? "Meta reaberta." : "Meta concluída. Muito bem!"));
+  revalidatePath("/app/dashboard");
+  redirect(feedback("/app/goals", "toast", done ? "Meta reaberta." : `Meta concluída.${xp.awarded ? " +25 XP." : ""}`));
 }
 
 export async function updateHabit(formData: FormData) {

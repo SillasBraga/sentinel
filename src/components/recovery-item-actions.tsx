@@ -3,18 +3,20 @@
 import { Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { deleteGoal, deleteHabit, updateGoal, updateHabit } from "@/features/recovery/actions";
+import { deleteGoal, deleteHabit, deleteJournalEntry, updateGoal, updateHabit, updateJournalEntry } from "@/features/recovery/actions";
 
 type Props = {
-  kind: "habit" | "goal";
+  kind: "habit" | "goal" | "journal";
   id: string;
-  title: string;
+  title: string | null;
   targetDate?: string | null;
+  body?: string;
 };
 
-export function RecoveryItemActions({ kind, id, title, targetDate }: Props) {
+export function RecoveryItemActions({ kind, id, title, targetDate, body }: Props) {
   const [modal, setModal] = useState<"edit" | "delete" | null>(null);
-  const label = kind === "habit" ? "hábito" : "meta";
+  const label = kind === "habit" ? "hábito" : kind === "goal" ? "meta" : "nota";
+  const itemTitle = title ?? "Nota sem título";
   const theme = modal && typeof document !== "undefined" && document.querySelector<HTMLElement>(".app-surface")?.dataset.theme === "dark" ? "dark" : "light";
 
   useEffect(() => {
@@ -41,13 +43,14 @@ export function RecoveryItemActions({ kind, id, title, targetDate }: Props) {
         </div>
 
         {modal === "edit" ? (
-          <form action={kind === "habit" ? updateHabit : updateGoal} className="mt-6 grid gap-4">
-            <input type="hidden" name={kind === "habit" ? "habitId" : "goalId"} value={id} />
+          <form action={kind === "habit" ? updateHabit : kind === "goal" ? updateGoal : updateJournalEntry} className="mt-6 grid gap-4">
+            <input type="hidden" name={kind === "habit" ? "habitId" : kind === "goal" ? "goalId" : "journalId"} value={id} />
             <label className="grid gap-2 text-sm font-bold">
-              {kind === "habit" ? "Nome do hábito" : "Título da meta"}
-              <input autoFocus required name={kind === "habit" ? "name" : "title"} defaultValue={title} className="min-h-12 rounded-xl border border-[var(--line)] bg-white px-4 font-normal" />
+              {kind === "habit" ? "Nome do hábito" : kind === "goal" ? "Título da meta" : "Título (opcional)"}
+              <input autoFocus required={kind !== "journal"} name={kind === "habit" ? "name" : "title"} defaultValue={title ?? ""} className="min-h-12 rounded-xl border border-[var(--line)] bg-white px-4 font-normal" />
             </label>
             {kind === "goal" && <label className="grid gap-2 text-sm font-bold">Data desejada<input name="targetDate" type="date" defaultValue={targetDate ?? ""} className="min-h-12 rounded-xl border border-[var(--line)] bg-white px-4 font-normal" /></label>}
+            {kind === "journal" && <label className="grid gap-2 text-sm font-bold">O que você quer registrar?<textarea required name="body" rows={7} defaultValue={body} className="resize-none rounded-xl border border-[var(--line)] bg-white p-4 font-normal leading-7" /></label>}
             <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button type="button" onClick={() => setModal(null)} className="min-h-11 rounded-full border border-[var(--line)] px-5 font-bold">Cancelar</button>
               <button className="primary-action min-h-11 rounded-full px-6 font-bold">Salvar alterações</button>
@@ -55,9 +58,9 @@ export function RecoveryItemActions({ kind, id, title, targetDate }: Props) {
           </form>
         ) : (
           <div className="mt-5">
-            <p className="leading-7 text-[var(--muted)]">Você está prestes a excluir <strong className="modal-strong">“{title}”</strong>. {kind === "habit" ? "Os registros de conclusão desse hábito também serão removidos." : "Esta ação remove a meta permanentemente."}</p>
-            <form action={kind === "habit" ? deleteHabit : deleteGoal} className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <input type="hidden" name={kind === "habit" ? "habitId" : "goalId"} value={id} />
+            <p className="leading-7 text-[var(--muted)]">Você está prestes a excluir <strong className="modal-strong">“{itemTitle}”</strong>. {kind === "habit" ? "Os registros de conclusão desse hábito também serão removidos." : kind === "goal" ? "Esta ação remove a meta permanentemente." : "Esta ação remove a nota permanentemente. O XP já conquistado permanece."}</p>
+            <form action={kind === "habit" ? deleteHabit : kind === "goal" ? deleteGoal : deleteJournalEntry} className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <input type="hidden" name={kind === "habit" ? "habitId" : kind === "goal" ? "goalId" : "journalId"} value={id} />
               <button type="button" onClick={() => setModal(null)} className="min-h-11 rounded-full border border-[var(--line)] px-5 font-bold">Cancelar</button>
               <button className="danger-action inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 font-bold"><Trash2 size={17} /> Excluir {label}</button>
             </form>
@@ -70,9 +73,9 @@ export function RecoveryItemActions({ kind, id, title, targetDate }: Props) {
 
   return (
     <>
-      <div className="flex shrink-0 items-center gap-2" aria-label={`Ações de ${title}`}>
-        <button type="button" onClick={() => setModal("edit")} className="item-icon-action item-icon-edit" aria-label={`Editar ${title}`} title="Editar"><Pencil size={17} /></button>
-        <button type="button" onClick={() => setModal("delete")} className="item-icon-action item-icon-delete" aria-label={`Excluir ${title}`} title="Excluir"><Trash2 size={17} /></button>
+      <div className="flex shrink-0 items-center gap-2" aria-label={`Ações de ${itemTitle}`}>
+        <button type="button" onClick={() => setModal("edit")} className="item-icon-action item-icon-edit" aria-label={`Editar ${itemTitle}`} title="Editar"><Pencil size={17} /></button>
+        <button type="button" onClick={() => setModal("delete")} className="item-icon-action item-icon-delete" aria-label={`Excluir ${itemTitle}`} title="Excluir"><Trash2 size={17} /></button>
       </div>
       {layer}
     </>

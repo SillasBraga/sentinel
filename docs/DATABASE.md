@@ -28,6 +28,8 @@ O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e r
 
 `daily_missions` mantém o estado resumido das três missões do dia civil do usuário: check-in, ao menos um hábito e um power-up de proteção. A chave primária é `(user_id, local_date)` e o `completed_at` só existe quando as três estão concluídas. Os eventos de check-in e hábito continuam sendo a fonte de histórico; a tabela de missões é um estado de interface persistido.
 
+`presence_xp_events` registra créditos de XP sem políticas de `update` ou `delete`. `award_presence_xp` valida que o evento de origem pertence ao usuário autenticado, define o valor permitido e usa uma chave única por fonte, impedindo crédito repetido ou arbitrário. XP é acumulativo e não é afetado por recaídas.
+
 ## Tipos gerados
 
 `src/types/database.generated.ts` representa o schema que o TypeScript conhece. Sempre regenere após alterar o banco. Não edite o arquivo manualmente.

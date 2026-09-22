@@ -5,17 +5,19 @@ import { calculateAlignedDaysRate, calculateAverageUrge, calculateCurrentStreak,
 import { calculateRiskScore, isTimeInRiskWindow } from "@/lib/risk-engine";
 import { formatInTimeZone } from "@/lib/analytics/timezone";
 import { summarizeDailyMissions } from "@/lib/daily-missions";
+import { getPresenceProgress } from "@/lib/presence-xp";
 
 export async function getDashboardData() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [profileResult, recoveryResult, relapsesResult, checkinsResult, urgesResult, sosResult] = await Promise.all([
+  const [profileResult, recoveryResult, relapsesResult, checkinsResult, urgesResult, sosResult, xpResult] = await Promise.all([
     supabase.from("profiles").select("display_name,timezone,hide_sensitive_numbers,onboarding_completed").eq("id", user.id).single(),
     supabase.from("recovery_profiles").select("started_at,risk_start,risk_end").eq("user_id", user.id).single(),
     supabase.from("relapse_events").select("occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: true }),
     supabase.from("daily_checkins").select("mood,urge_level,situations,occurred_at,local_date").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("urges").select("intensity,occurred_at,alone").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("sos_sessions").select("started_at").eq("user_id", user.id).eq("completed", true).order("started_at", { ascending: false }).limit(100),
+    supabase.from("presence_xp_events").select("points").eq("user_id", user.id),
   ]);
 
   const profile = profileResult.data;
@@ -70,6 +72,7 @@ export async function getDashboardData() {
     lastCheckin,
     recentAverageUrge: calculateAverageUrge(intensityValues),
     recentSosCount,
+    presenceXp: getPresenceProgress((xpResult.data ?? []).reduce((total, event) => total + event.points, 0)),
     missions: summarizeDailyMissions({
       checkinCompleted: Boolean(mission?.checkin_completed) || checkins.some((checkin) => checkin.local_date === localDate),
       habitCompleted: Boolean(mission?.habit_completed) || Boolean(habitLogs?.length),

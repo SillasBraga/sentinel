@@ -1,9 +1,10 @@
 begin;
-select plan(6);
+select plan(7);
 select has_table('public','profiles','profiles exists');
 select policies_are('public','journal_entries',array['own journal'],'journal only has owner policy');
 select policies_are('public','daily_checkins',array['own checkins'],'checkins only has owner policy');
 select policies_are('public','daily_missions',array['own daily missions'],'daily missions only has owner policy');
+select policies_are('public','presence_xp_events',array['own presence xp read'],'presence XP is immutable to the user');
 select policies_are('public','accountability_relationships',array['owner manages relationship','relationship parties read'],'relationships have explicit policies');
 select policies_are('public','support_requests',array['owner creates requests','partner acknowledges requests','relationship parties read requests'],'requests enforce relationship');
 select * from finish();
