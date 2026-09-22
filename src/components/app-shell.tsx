@@ -39,6 +39,7 @@ const nav = [
 ] as const;
 
 const tools = [
+  { href: "/app/plan", label: "Meu plano", icon: ShieldCheck },
   { href: "/app/habits", label: "Hábitos", icon: Dumbbell },
   { href: "/app/goals", label: "Metas", icon: Target },
   { href: "/app/calendar", label: "Calendário", icon: CalendarDays },

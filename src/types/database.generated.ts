@@ -186,6 +186,35 @@ export type Database = {
           },
         ]
       }
+      attention_zones: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attention_zones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_checkins: {
         Row: {
           created_at: string
@@ -525,6 +554,45 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "personal_reasons_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      power_up_logs: {
+        Row: {
+          activity_id: string
+          completed_at: string
+          id: string
+          local_date: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          completed_at?: string
+          id?: string
+          local_date: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          completed_at?: string
+          id?: string
+          local_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "power_up_logs_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "alternative_activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "power_up_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -936,6 +1004,7 @@ export type Database = {
         Row: {
           alone: boolean | null
           associated_platform: string | null
+          attention_zone_id: string | null
           context: string | null
           created_at: string
           emotion: string | null
@@ -944,6 +1013,7 @@ export type Database = {
           location_context: string | null
           occurred_at: string
           outcome: string | null
+          protection_strategy: string | null
           response_taken: string | null
           thought: string | null
           user_id: string
@@ -951,6 +1021,7 @@ export type Database = {
         Insert: {
           alone?: boolean | null
           associated_platform?: string | null
+          attention_zone_id?: string | null
           context?: string | null
           created_at?: string
           emotion?: string | null
@@ -959,6 +1030,7 @@ export type Database = {
           location_context?: string | null
           occurred_at?: string
           outcome?: string | null
+          protection_strategy?: string | null
           response_taken?: string | null
           thought?: string | null
           user_id: string
@@ -966,6 +1038,7 @@ export type Database = {
         Update: {
           alone?: boolean | null
           associated_platform?: string | null
+          attention_zone_id?: string | null
           context?: string | null
           created_at?: string
           emotion?: string | null
@@ -974,11 +1047,19 @@ export type Database = {
           location_context?: string | null
           occurred_at?: string
           outcome?: string | null
+          protection_strategy?: string | null
           response_taken?: string | null
           thought?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "urges_attention_zone_id_fkey"
+            columns: ["attention_zone_id"]
+            isOneToOne: false
+            referencedRelation: "attention_zones"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "urges_user_id_fkey"
             columns: ["user_id"]
@@ -1047,6 +1128,10 @@ export type Database = {
       complete_onboarding: {
         Args: { p_payload: Json; p_user_id: string }
         Returns: undefined
+      }
+      complete_power_up: {
+        Args: { p_activity_id: string; p_local_date: string }
+        Returns: boolean
       }
     }
     Enums: {

@@ -1,4 +1,4 @@
-import { ArrowRight, HeartPulse, LifeBuoy, RotateCcw } from "lucide-react";
+import { ArrowRight, Crosshair, HeartPulse, LifeBuoy, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 
@@ -28,6 +28,10 @@ export default function RecordsPage() {
           <span className="mt-6 inline-flex items-center gap-2 font-extrabold">Registrar com privacidade <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" /></span>
         </Link>
       </div>
+
+      <Link href="/app/triggers" className="group mt-5 flex flex-col rounded-[1.6rem] border border-[var(--line)] bg-white/55 p-5 transition hover:-translate-y-0.5 hover:shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#d9eee7] text-[var(--teal-deep)]"><Crosshair size={21} /></span><div><p className="eyebrow text-[var(--teal-deep)]">Zonas de atenção</p><strong className="mt-1 block text-lg">Nomeie desafios que voltam</strong><p className="mt-1 text-sm leading-6 text-[var(--muted)]">Acompanhe frequência, contexto e estratégias de proteção.</p></div></div><span className="mt-4 inline-flex items-center gap-2 font-extrabold text-[var(--teal-deep)] sm:mt-0">Abrir zonas <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" /></span>
+      </Link>
 
       <section className="mt-5 flex flex-col gap-4 rounded-[1.6rem] border border-[var(--line)] bg-white/55 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="flex gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#e5f2ff] text-[#246b91]"><LifeBuoy size={21} /></span><div><strong className="block text-lg">Precisa atravessar um impulso agora?</strong><p className="mt-1 text-sm leading-6 text-[var(--muted)]">O SOS é apoio imediato. A sessão entra no histórico, mas não registra uma recaída.</p></div></div>

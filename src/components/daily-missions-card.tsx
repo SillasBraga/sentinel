@@ -1,10 +1,8 @@
 import { Check, ClipboardCheck, Dumbbell, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { SubmitButton } from "@/components/form-controls";
-import { completeProtectionMission } from "@/features/daily-missions/actions";
 import type { DailyMissionSummary } from "@/lib/daily-missions";
 
-export function DailyMissionsCard({ missions }: { missions: DailyMissionSummary }) {
+export function DailyMissionsCard({ missions, hasPowerUps }: { missions: DailyMissionSummary; hasPowerUps: boolean }) {
   const items = [
     { label: "Registrar um momento", detail: "Check-in", href: "/app/checkin", done: missions.checkinCompleted, icon: <ClipboardCheck size={18} /> },
     { label: "Concluir um hábito", detail: "Hábitos", href: "/app/habits", done: missions.habitCompleted, icon: <Dumbbell size={18} /> },
@@ -27,10 +25,10 @@ export function DailyMissionsCard({ missions }: { missions: DailyMissionSummary 
           <div className="min-w-0 flex-1"><strong className={item.done ? "text-[var(--muted)]" : ""}>{item.label}</strong><p className="text-sm text-[var(--muted)]">{item.done ? "Concluída hoje" : `Abrir ${item.detail}`}</p></div>
           {!item.done && <Link href={item.href as never} className="rounded-full px-3 py-2 text-sm font-extrabold text-[var(--teal-deep)] hover:bg-[#d9eee7]">Abrir</Link>}
         </li>)}
-        <li className="flex flex-wrap items-center gap-4 py-4">
+        <li id="power-up" className="flex flex-wrap items-center gap-4 py-4">
           <span className={`grid size-10 shrink-0 place-items-center rounded-full ${missions.protectionCompleted ? "bg-[#d9eee7] text-[var(--teal-deep)]" : "bg-[var(--paper)] text-[var(--muted)]"}`}>{missions.protectionCompleted ? <Check size={19} strokeWidth={3} /> : <ShieldCheck size={18} />}</span>
           <div className="min-w-0 flex-1"><strong className={missions.protectionCompleted ? "text-[var(--muted)]" : ""}>Ativar um power-up</strong><p className="text-sm text-[var(--muted)]">{missions.protectionCompleted ? "Concluído hoje" : "Escolha uma ação para proteger seu ambiente."}</p></div>
-          {missions.protectionCompleted ? null : <form action={completeProtectionMission}><SubmitButton>Concluir</SubmitButton></form>}
+          {missions.protectionCompleted ? null : hasPowerUps ? <Link href="/app/dashboard#power-ups" className="rounded-full px-3 py-2 text-sm font-extrabold text-[var(--teal-deep)] hover:bg-[#d9eee7]">Escolher</Link> : <Link href="/app/plan#power-ups" className="rounded-full px-3 py-2 text-sm font-extrabold text-[var(--teal-deep)] hover:bg-[#d9eee7]">Adicionar</Link>}
         </li>
       </ul>
       {missions.isComplete && <div role="status" className="flex items-center gap-3 bg-[#d9eee7] px-5 py-4 text-sm font-bold text-[var(--teal-deep)] sm:px-7"><Check size={18} strokeWidth={3} /> Missões concluídas por hoje. Obrigado por cuidar de você.</div>}

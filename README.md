@@ -9,7 +9,11 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Autenticação por e-mail e senha, recuperação de senha e link mágico via Supabase Auth.
 - Onboarding e preferências pessoais protegidas por Row Level Security (RLS).
 - Check-in emocional com resultado explicativo e atualização dos indicadores.
-- Dashboard, calendário histórico navegável, hábitos, metas e diário.
+- Dashboard, calendário histórico navegável, hábitos, metas, diário e objetivo diário privado.
+- Missões diárias e XP de presença, com créditos limitados por evento e sem ranking público.
+- Marcos privados que celebram presença, autocuidado, SOS e recomeços sem competição.
+- Zonas de atenção para desafios recorrentes, com contexto, estratégia de proteção e atalhos para SOS.
+- Power-ups reutilizáveis no menu **Meu plano**, concluíveis uma vez por ação por dia e conectados à missão de proteção.
 - Fluxo SOS com pausa guiada de dez minutos.
 - Convite de accountability com compartilhamento mínimo de informações.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.
@@ -134,6 +138,7 @@ Dados desta aplicação podem ser sensíveis. Não inclua `.env.local`, chaves, 
 - [Segurança](docs/SECURITY.md)
 - [Guia para agentes de IA](docs/AI_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Changelog](CHANGELOG.md)
 - [Como contribuir](CONTRIBUTING.md)
 
 ## Licença

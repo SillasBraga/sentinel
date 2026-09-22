@@ -30,6 +30,10 @@ O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e r
 
 `daily_focuses` mantém um foco textual por usuário e dia civil, usando o fuso salvo no perfil. O usuário pode revisar ou marcar o foco como concluído durante o dia; ele não gera XP, não é compartilhado e não altera missões ou sequência.
 
+`attention_zones` registra desafios nomeados pelo usuário. Registros de impulso podem apontar para uma zona e para a estratégia de proteção usada; assim a interface calcula frequência, contexto e estratégia mais registrada sem expor dados a outras pessoas.
+
+`alternative_activities` é o catálogo privado de power-ups reutilizáveis. `power_up_logs` preserva uma conclusão por ação e dia civil; `complete_power_up` valida a ação e o dia pelo usuário autenticado. A primeira conclusão diária atualiza missão de proteção e pode conceder os 10 XP já definidos para esse crédito.
+
 `presence_xp_events` registra créditos de XP sem políticas de `update` ou `delete`. `award_presence_xp` valida que o evento de origem pertence ao usuário autenticado, define o valor permitido e usa uma chave única por fonte, impedindo crédito repetido ou arbitrário. XP é acumulativo e não é afetado por recaídas.
 
 `user_achievements` preserva marcos privados uma única vez por usuário e marco. `award_private_milestones` usa apenas `auth.uid()` e dados do próprio usuário para avaliar os critérios; clientes não podem inserir marcos diretamente. O catálogo inicial celebra check-ins, presença, SOS e recomeços, sem comparação entre pessoas.

@@ -7,6 +7,8 @@ Este diretório define o ambiente local e o contrato persistente do Sentinel.
 - `seed.sql`: dados sintéticos mínimos para desenvolvimento.
 - `tests/rls.sql`: testes de isolamento e autorização.
 
+As migrations recentes acrescentam `daily_focuses`, `attention_zones` e `power_up_logs`. A função `complete_power_up` valida usuário, propriedade da ação e data civil antes de registrar uma conclusão; as funções de XP e marcos preservam eventos imutáveis.
+
 Fluxo comum:
 
 ```bash

@@ -47,14 +47,18 @@ export async function createCheckin(formData: FormData) {
   redirect(withMilestones(withLevelUp(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : `Momento salvo. Missões de hoje atualizadas.${xp.awarded ? " +15 XP." : ""}`), xp.levelUp ? xp.level : undefined), milestones.success ? milestones.milestoneIds : []));
 }
 
-const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), alone: z.boolean() });
+const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), attentionZoneId: z.uuid().optional(), protectionStrategy: z.string().trim().max(120).optional(), alone: z.boolean() });
 
 export async function createUrge(formData: FormData) {
   const user = await requireUser();
-  const parsed = urgeSchema.safeParse({ intensity: formData.get("intensity"), emotion: formData.get("emotion") || undefined, context: formData.get("context") || undefined, location: formData.get("location") || undefined, platform: formData.get("platform") || undefined, thought: formData.get("thought") || undefined, response: formData.get("response") || undefined, alone: formData.get("alone") === "on" });
+  const parsed = urgeSchema.safeParse({ intensity: formData.get("intensity"), emotion: formData.get("emotion") || undefined, context: formData.get("context") || undefined, location: formData.get("location") || undefined, platform: formData.get("platform") || undefined, thought: formData.get("thought") || undefined, response: formData.get("response") || undefined, attentionZoneId: formData.get("attentionZoneId") || undefined, protectionStrategy: formData.get("protectionStrategy") || undefined, alone: formData.get("alone") === "on" });
   if (!parsed.success) redirect(feedback("/app/triggers", "error", "Revise os campos do registro."));
   const supabase = await createClient();
-  const { error } = await supabase.from("urges").insert({ user_id: user.id, intensity: parsed.data.intensity, emotion: parsed.data.emotion, context: parsed.data.context, location_context: parsed.data.location, associated_platform: parsed.data.platform, thought: parsed.data.thought, response_taken: parsed.data.response, alone: parsed.data.alone });
+  if (parsed.data.attentionZoneId) {
+    const { data: zone } = await supabase.from("attention_zones").select("id").eq("id", parsed.data.attentionZoneId).eq("user_id", user.id).maybeSingle();
+    if (!zone) redirect(feedback("/app/triggers", "error", "Zona de atenção inválida."));
+  }
+  const { error } = await supabase.from("urges").insert({ user_id: user.id, intensity: parsed.data.intensity, emotion: parsed.data.emotion, context: parsed.data.context, location_context: parsed.data.location, associated_platform: parsed.data.platform, thought: parsed.data.thought, response_taken: parsed.data.response, attention_zone_id: parsed.data.attentionZoneId, protection_strategy: parsed.data.protectionStrategy, alone: parsed.data.alone });
   if (error) redirect(feedback("/app/triggers", "error", "Não foi possível salvar o registro."));
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");

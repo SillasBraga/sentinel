@@ -2,7 +2,7 @@
 
 ## MVP
 
-Auth, onboarding, dashboard, streak derivado, check-ins, gatilhos, SOS, recaídas, progresso, calendário, hábitos, metas, plano, accountability, modo discreto, exportação/exclusão, PWA e notificações neutras.
+Auth, onboarding, dashboard, streak derivado, check-ins, gatilhos e zonas de atenção, SOS, recaídas, progresso, calendário, hábitos, metas, objetivo diário, plano com power-ups, missões diárias, XP de presença, marcos privados, accountability, modo discreto, exportação/exclusão, PWA e notificações neutras.
 
 ## V2
 

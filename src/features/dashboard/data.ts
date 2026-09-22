@@ -10,7 +10,7 @@ import { getPresenceProgress } from "@/lib/presence-xp";
 export async function getDashboardData() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [profileResult, recoveryResult, relapsesResult, checkinsResult, urgesResult, sosResult, xpResult] = await Promise.all([
+  const [profileResult, recoveryResult, relapsesResult, checkinsResult, urgesResult, sosResult, xpResult, powerUpsResult] = await Promise.all([
     supabase.from("profiles").select("display_name,timezone,hide_sensitive_numbers,onboarding_completed").eq("id", user.id).single(),
     supabase.from("recovery_profiles").select("started_at,risk_start,risk_end").eq("user_id", user.id).single(),
     supabase.from("relapse_events").select("occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: true }),
@@ -18,6 +18,7 @@ export async function getDashboardData() {
     supabase.from("urges").select("intensity,occurred_at,alone").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("sos_sessions").select("started_at").eq("user_id", user.id).eq("completed", true).order("started_at", { ascending: false }).limit(100),
     supabase.from("presence_xp_events").select("points").eq("user_id", user.id),
+    supabase.from("alternative_activities").select("id,label").eq("user_id", user.id).eq("active", true).order("created_at", { ascending: true }),
   ]);
 
   const profile = profileResult.data;
@@ -25,10 +26,11 @@ export async function getDashboardData() {
   const timezone = profile?.timezone ?? "America/Sao_Paulo";
   const now = new Date();
   const localDate = formatInTimeZone(now.toISOString(), timezone);
-  const [{ data: mission }, { data: habitLogs }, { data: dailyFocus }] = await Promise.all([
+  const [{ data: mission }, { data: habitLogs }, { data: dailyFocus }, { data: powerUpLogs }] = await Promise.all([
     supabase.from("daily_missions").select("checkin_completed,habit_completed,protection_completed").eq("user_id", user.id).eq("local_date", localDate).maybeSingle(),
     supabase.from("habit_logs").select("id").eq("user_id", user.id).eq("local_date", localDate),
     supabase.from("daily_focuses").select("focus,completed_at").eq("user_id", user.id).eq("local_date", localDate).maybeSingle(),
+    supabase.from("power_up_logs").select("activity_id").eq("user_id", user.id).eq("local_date", localDate),
   ]);
   const thirtyDaysAgo = now.getTime() - 30 * 86_400_000;
   const relapses = relapsesResult.data ?? [];
@@ -74,6 +76,8 @@ export async function getDashboardData() {
     recentAverageUrge: calculateAverageUrge(intensityValues),
     recentSosCount,
     presenceXp: getPresenceProgress((xpResult.data ?? []).reduce((total, event) => total + event.points, 0)),
+    powerUps: powerUpsResult.data ?? [],
+    completedPowerUpIds: (powerUpLogs ?? []).map((log) => log.activity_id),
     dailyFocus: dailyFocus ? { text: dailyFocus.focus, completed: dailyFocus.completed_at !== null } : null,
     missions: summarizeDailyMissions({
       checkinCompleted: Boolean(mission?.checkin_completed) || checkins.some((checkin) => checkin.local_date === localDate),

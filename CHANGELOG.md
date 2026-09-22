@@ -11,3 +11,8 @@ Todas as mudanças relevantes serão registradas neste arquivo. O formato segue 
 - PWA responsiva, temas por usuário, toasts e modais de edição/exclusão.
 - Supabase com migrations, RLS, seed e testes de segurança.
 - Documentação para desenvolvimento, deploy, contribuição e agentes de IA.
+- Objetivo diário privado, exibido na Base e concluível durante o mesmo dia civil.
+- Missões diárias e XP de presença para check-in, hábito, SOS, reflexão, meta e proteção.
+- Marcos privados de presença, autocuidado e recomeço, sem ranking, competição ou monetização.
+- Zonas de atenção editáveis e excluíveis, com frequência, contexto, estratégia e atalhos de apoio.
+- Power-ups cadastráveis em **Meu plano**, reutilizáveis na Base e no plano, com conclusão diária por ação.

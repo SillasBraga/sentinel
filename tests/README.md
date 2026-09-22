@@ -1,6 +1,6 @@
 # Testes unitários
 
-Os testes Vitest deste diretório cobrem regras puras que não precisam de navegador ou banco real: permissões, cálculo de risco e analytics de recuperação.
+Os testes Vitest deste diretório cobrem regras puras que não precisam de navegador ou banco real: permissões, cálculo de risco, analytics de recuperação, missões diárias, XP de presença, marcos privados e resumos de zonas de atenção.
 
 ```bash
 npm test

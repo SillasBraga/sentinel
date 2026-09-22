@@ -4,6 +4,8 @@ Este diretório concentra decisões técnicas, instruções operacionais e conte
 
 ## Para começar
 
+O produto inclui missões diárias, XP de presença, objetivos do dia, marcos privados, zonas de atenção e power-ups. Os power-ups são cadastrados em **Meu plano** e podem ser concluídos na Base ou no próprio plano.
+
 - [SETUP.md](SETUP.md): ambiente local, Supabase e usuário demo.
 - [ARCHITECTURE.md](ARCHITECTURE.md): componentes, fronteiras e fluxos de dados.
 - [DATABASE.md](DATABASE.md): migrations, RLS, tipos e operação do banco.

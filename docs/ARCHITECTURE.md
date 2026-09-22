@@ -32,6 +32,10 @@ As missões diárias usam `daily_missions`, indexada por usuário e data civil n
 
 O objetivo do dia é um único texto em `daily_focuses`, isolado por usuário e data civil. A Base permite defini-lo, atualizá-lo ou marcá-lo como concluído; ele serve como lembrete privado e não altera métricas, XP ou sequência.
 
+Zonas de atenção são desafios privados em `attention_zones`. Um registro de impulso pode associar uma zona e a estratégia usada; a página agrega somente os próprios registros para mostrar frequência, contexto e estratégia mais frequente, com atalhos para SOS e power-up.
+
+Power-ups reutilizam `alternative_activities` como equipamento da jornada. A conclusão escreve um evento imutável, atualiza a missão diária de proteção e usa o crédito de XP de proteção já existente, limitado ao primeiro power-up do dia.
+
 XP de presença é um histórico imutável em `presence_xp_events`: check-in rende 15 XP, hábito 10, SOS concluído 20, reflexão no diário 10, power-up de proteção 10 e meta concluída 25. Uma função SQL valida a propriedade do evento de origem e aplica cada crédito uma única vez. O desafio cresce a cada nível: nível 1 exige 100 XP, nível 2 exige 200 XP, nível 3 exige 300 XP, e assim sucessivamente. Ao alcançar um novo nível, o shell protegido mostra uma celebração em qualquer tela; recaídas não alteram esse histórico.
 
 Marcos privados usam o catálogo `achievements` e o histórico imutável `user_achievements`. A função SQL autenticada avalia primeiro check-in, sete dias com check-in, três SOS concluídos, cinco check-ins em sete dias e recomeço consciente. Somente o dono pode ler marcos conquistados; a interface não tem ranking, competição, monetização ou compartilhamento com accountability.

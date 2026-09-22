@@ -2,7 +2,7 @@
 
 ## Pirâmide atual
 
-- `tests/`: regras puras de risco, recuperação e permissões com Vitest.
+- `tests/`: regras puras de risco, recuperação, missões diárias, XP, marcos, zonas de atenção e permissões com Vitest.
 - `supabase/tests/`: isolamento e políticas RLS executados pelo Supabase CLI.
 - `e2e/`: fluxos reais de navegador com Playwright.
 - `npm run typecheck`, `npm run lint` e `npm run build`: contratos, qualidade estática e integração do Next.js.
