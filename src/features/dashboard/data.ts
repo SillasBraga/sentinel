@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { calculateAlignedDaysRate, calculateAverageUrge, calculateCurrentStreak, calculateLongestStreak } from "@/lib/analytics/recovery";
 import { calculateRiskScore, isTimeInRiskWindow } from "@/lib/risk-engine";
+import { formatInTimeZone } from "@/lib/analytics/timezone";
+import { summarizeDailyMissions } from "@/lib/daily-missions";
 
 export async function getDashboardData() {
   const user = await requireUser();
@@ -20,6 +22,11 @@ export async function getDashboardData() {
   const recovery = recoveryResult.data;
   const timezone = profile?.timezone ?? "America/Sao_Paulo";
   const now = new Date();
+  const localDate = formatInTimeZone(now.toISOString(), timezone);
+  const [{ data: mission }, { data: habitLogs }] = await Promise.all([
+    supabase.from("daily_missions").select("checkin_completed,habit_completed,protection_completed").eq("user_id", user.id).eq("local_date", localDate).maybeSingle(),
+    supabase.from("habit_logs").select("id").eq("user_id", user.id).eq("local_date", localDate),
+  ]);
   const thirtyDaysAgo = now.getTime() - 30 * 86_400_000;
   const relapses = relapsesResult.data ?? [];
   const checkins = checkinsResult.data ?? [];
@@ -63,5 +70,10 @@ export async function getDashboardData() {
     lastCheckin,
     recentAverageUrge: calculateAverageUrge(intensityValues),
     recentSosCount,
+    missions: summarizeDailyMissions({
+      checkinCompleted: Boolean(mission?.checkin_completed) || checkins.some((checkin) => checkin.local_date === localDate),
+      habitCompleted: Boolean(mission?.habit_completed) || Boolean(habitLogs?.length),
+      protectionCompleted: mission?.protection_completed ?? false,
+    }),
   };
 }

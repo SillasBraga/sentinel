@@ -26,6 +26,8 @@ Na interface, os registros foram consolidados em dois fluxos principais: **momen
 
 O calendário cruza check-ins, conclusões de hábitos, impulsos, sessões SOS, metas e recomeços pelo fuso horário do perfil. A grade mensal é navegável, inclui filtros locais e exibe apenas resumos no detalhe diário; textos íntimos de recaídas, impulsos e diário não são reproduzidos nessa visão agregada.
 
+As missões diárias usam `daily_missions`, indexada por usuário e data civil no fuso do perfil. Check-in e primeira conclusão de hábito do dia sincronizam o estado automaticamente; o power-up de proteção é uma confirmação explícita do usuário. A conclusão não altera a sequência de recuperação nem compartilha dados com accountability.
+
 ## SOS
 
 A sessão é criada ao iniciar e finalizada com intensidade final, duração e estratégias. Se a persistência falhar, o protocolo visual continua disponível. Conteúdo do SOS usa uma motivação e uma atividade cadastradas pelo próprio usuário.

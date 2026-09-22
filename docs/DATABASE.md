@@ -26,6 +26,8 @@ Os testes em `supabase/tests/rls.sql` verificam isolamento entre contas e permis
 
 O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e recaídas são eventos. Indicadores como sequência, alinhamento e risco são derivados desses registros. Preferências estáveis ficam no perfil; o tema atual é persistido por usuário.
 
+`daily_missions` mantém o estado resumido das três missões do dia civil do usuário: check-in, ao menos um hábito e um power-up de proteção. A chave primária é `(user_id, local_date)` e o `completed_at` só existe quando as três estão concluídas. Os eventos de check-in e hábito continuam sendo a fonte de histórico; a tabela de missões é um estado de interface persistido.
+
 ## Tipos gerados
 
 `src/types/database.generated.ts` representa o schema que o TypeScript conhece. Sempre regenere após alterar o banco. Não edite o arquivo manualmente.

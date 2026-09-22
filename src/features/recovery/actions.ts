@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatInTimeZone } from "@/lib/analytics/timezone";
+import { updateDailyMission } from "@/features/daily-missions/service";
 
 function feedback(path: string, type: "toast" | "error", message: string): Route {
   return `${path}${path.includes("?") ? "&" : "?"}${type}=${encodeURIComponent(message)}` as Route;
@@ -20,12 +21,16 @@ export async function createCheckin(formData: FormData) {
   if (!parsed.success) redirect(feedback("/app/checkin", "error", "Revise as respostas antes de salvar."));
   const supabase = await createClient();
   const { data: profile } = await supabase.from("profiles").select("timezone").eq("id", user.id).single();
-  const { data, error } = await supabase.from("daily_checkins").upsert({ user_id: user.id, local_date: formatInTimeZone(new Date().toISOString(), profile?.timezone ?? "UTC"), mood: parsed.data.mood, urge_level: parsed.data.urgeLevel, exposure: parsed.data.exposure, situations: parsed.data.situations, small_win: parsed.data.smallWin || null, occurred_at: new Date().toISOString() }, { onConflict: "user_id,local_date" }).select("id").single();
+  const now = new Date();
+  const localDate = formatInTimeZone(now.toISOString(), profile?.timezone ?? "UTC");
+  const { data, error } = await supabase.from("daily_checkins").upsert({ user_id: user.id, local_date: localDate, mood: parsed.data.mood, urge_level: parsed.data.urgeLevel, exposure: parsed.data.exposure, situations: parsed.data.situations, small_win: parsed.data.smallWin || null, occurred_at: now.toISOString() }, { onConflict: "user_id,local_date" }).select("id").single();
   if (error || !data) redirect(feedback("/app/checkin", "error", "Não foi possível salvar o check-in."));
+  const mission = await updateDailyMission(user.id, localDate, { checkinCompleted: true });
+  if (!mission.success) redirect(feedback(`/app/checkin/result?id=${data.id}`, "error", "Momento salvo, mas não foi possível atualizar as missões."));
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");
   revalidatePath("/app/calendar");
-  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", "Momento salvo. Início, Progresso e Calendário foram atualizados."));
+  redirect(feedback(`/app/checkin/result?id=${data.id}`, "toast", mission.summary.isComplete ? "Momento salvo. Missões de hoje concluídas." : "Momento salvo. Missões de hoje atualizadas."));
 }
 
 const urgeSchema = z.object({ intensity: z.coerce.number().int().min(0).max(10), emotion: z.string().max(80).optional(), context: z.string().max(80).optional(), location: z.string().max(80).optional(), platform: z.string().max(120).optional(), thought: z.string().max(2000).optional(), response: z.string().max(500).optional(), alone: z.boolean() });
@@ -75,12 +80,21 @@ export async function toggleHabit(formData: FormData) {
   const date = z.string().date().safeParse(formData.get("date"));
   if (!id.success || !date.success) redirect(feedback("/app/habits", "error", "Não foi possível identificar o hábito."));
   const supabase = await createClient();
+  const { data: profile } = await supabase.from("profiles").select("timezone").eq("id", user.id).single();
+  const today = formatInTimeZone(new Date().toISOString(), profile?.timezone ?? "America/Sao_Paulo");
+  if (date.data !== today) redirect(feedback("/app/habits", "error", "Os hábitos só podem ser atualizados para hoje."));
+  const { data: habit } = await supabase.from("habits").select("id").eq("id", id.data).eq("user_id", user.id).maybeSingle();
+  if (!habit) redirect(feedback("/app/habits", "error", "Hábito não encontrado."));
   const { data, error: readError } = await supabase.from("habit_logs").select("id").eq("habit_id", id.data).eq("user_id", user.id).eq("local_date", date.data).maybeSingle();
   if (readError) redirect(feedback("/app/habits", "error", "Não foi possível atualizar o hábito."));
   const result = data ? await supabase.from("habit_logs").delete().eq("id", data.id).eq("user_id", user.id) : await supabase.from("habit_logs").insert({ habit_id: id.data, user_id: user.id, local_date: date.data });
   if (result.error) redirect(feedback("/app/habits", "error", "Não foi possível atualizar o hábito."));
+  const { count, error: countError } = await supabase.from("habit_logs").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("local_date", date.data);
+  const mission = countError ? { success: false as const } : await updateDailyMission(user.id, date.data, { habitCompleted: (count ?? 0) > 0 });
+  if (!mission.success) redirect(feedback("/app/habits", "error", "Hábito atualizado, mas não foi possível atualizar as missões."));
   revalidatePath("/app/habits");
-  redirect(feedback("/app/habits", "toast", data ? "Conclusão do hábito desmarcada." : "Hábito concluído hoje."));
+  revalidatePath("/app/dashboard");
+  redirect(feedback("/app/habits", "toast", mission.summary.isComplete ? "Hábito concluído. Missões de hoje concluídas." : data ? "Conclusão do hábito desmarcada." : "Hábito concluído hoje. Missões atualizadas."));
 }
 
 export async function createJournalEntry(formData: FormData) {
