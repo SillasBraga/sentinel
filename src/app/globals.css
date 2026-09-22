@@ -343,6 +343,25 @@ label:has(> input[type="radio"]:checked) {
   background-color: #193638;
 }
 
+.app-surface[data-theme="dark"] .daily-focus-card {
+  border-color: rgba(113, 219, 198, .18);
+  background: linear-gradient(145deg, rgba(19, 45, 47, .96), rgba(15, 39, 41, .94));
+}
+
+.app-surface[data-theme="dark"] .daily-focus-current {
+  background: rgba(65, 199, 174, .12);
+  color: #edf8f5;
+}
+
+.app-surface[data-theme="dark"] .daily-focus-current button:not(.primary-action) {
+  border-color: rgba(225, 247, 241, .22);
+  color: #dffbf4;
+}
+
+.app-surface[data-theme="dark"] .daily-focus-current button:not(.primary-action):hover {
+  background: rgba(225, 247, 241, .08);
+}
+
 .app-surface[data-theme="dark"] label:has(> input[type="checkbox"]:checked),
 .app-surface[data-theme="dark"] label:has(> input[type="radio"]:checked) {
   border-color: rgba(113, 219, 198, .42);

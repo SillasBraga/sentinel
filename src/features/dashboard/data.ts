@@ -25,9 +25,10 @@ export async function getDashboardData() {
   const timezone = profile?.timezone ?? "America/Sao_Paulo";
   const now = new Date();
   const localDate = formatInTimeZone(now.toISOString(), timezone);
-  const [{ data: mission }, { data: habitLogs }] = await Promise.all([
+  const [{ data: mission }, { data: habitLogs }, { data: dailyFocus }] = await Promise.all([
     supabase.from("daily_missions").select("checkin_completed,habit_completed,protection_completed").eq("user_id", user.id).eq("local_date", localDate).maybeSingle(),
     supabase.from("habit_logs").select("id").eq("user_id", user.id).eq("local_date", localDate),
+    supabase.from("daily_focuses").select("focus,completed_at").eq("user_id", user.id).eq("local_date", localDate).maybeSingle(),
   ]);
   const thirtyDaysAgo = now.getTime() - 30 * 86_400_000;
   const relapses = relapsesResult.data ?? [];
@@ -73,6 +74,7 @@ export async function getDashboardData() {
     recentAverageUrge: calculateAverageUrge(intensityValues),
     recentSosCount,
     presenceXp: getPresenceProgress((xpResult.data ?? []).reduce((total, event) => total + event.points, 0)),
+    dailyFocus: dailyFocus ? { text: dailyFocus.focus, completed: dailyFocus.completed_at !== null } : null,
     missions: summarizeDailyMissions({
       checkinCompleted: Boolean(mission?.checkin_completed) || checkins.some((checkin) => checkin.local_date === localDate),
       habitCompleted: Boolean(mission?.habit_completed) || Boolean(habitLogs?.length),

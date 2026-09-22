@@ -28,6 +28,8 @@ O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e r
 
 `daily_missions` mantém o estado resumido das três missões do dia civil do usuário: check-in, ao menos um hábito e um power-up de proteção. A chave primária é `(user_id, local_date)` e o `completed_at` só existe quando as três estão concluídas. Os eventos de check-in e hábito continuam sendo a fonte de histórico; a tabela de missões é um estado de interface persistido.
 
+`daily_focuses` mantém um foco textual por usuário e dia civil, usando o fuso salvo no perfil. O usuário pode revisar ou marcar o foco como concluído durante o dia; ele não gera XP, não é compartilhado e não altera missões ou sequência.
+
 `presence_xp_events` registra créditos de XP sem políticas de `update` ou `delete`. `award_presence_xp` valida que o evento de origem pertence ao usuário autenticado, define o valor permitido e usa uma chave única por fonte, impedindo crédito repetido ou arbitrário. XP é acumulativo e não é afetado por recaídas.
 
 `user_achievements` preserva marcos privados uma única vez por usuário e marco. `award_private_milestones` usa apenas `auth.uid()` e dados do próprio usuário para avaliar os critérios; clientes não podem inserir marcos diretamente. O catálogo inicial celebra check-ins, presença, SOS e recomeços, sem comparação entre pessoas.

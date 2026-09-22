@@ -236,6 +236,41 @@ export type Database = {
           },
         ]
       }
+      daily_focuses: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          focus: string
+          local_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          focus: string
+          local_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          focus?: string
+          local_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_focuses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_missions: {
         Row: {
           checkin_completed: boolean
