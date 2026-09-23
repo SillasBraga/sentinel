@@ -53,7 +53,7 @@ const tools = [
 const mobileNav = nav.filter(({ href }) => ["/app/dashboard", "/app/records", "/app/progress", "/app/sos"].includes(href));
 const moreNav = [...nav.filter(({ href }) => ["/app/journal", "/app/settings"].includes(href)), ...tools];
 
-export function AppShell({ children, discreetMode = false, theme = "light" }: { children: React.ReactNode; discreetMode?: boolean; theme?: "light" | "dark" }) {
+export function AppShell({ children, discreetMode = false, theme = "light", cosmeticStyle = "base" }: { children: React.ReactNode; discreetMode?: boolean; theme?: "light" | "dark"; cosmeticStyle?: "base" | "aurora" | "constellation" }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
@@ -116,7 +116,7 @@ export function AppShell({ children, discreetMode = false, theme = "light" }: { 
   };
 
   return (
-    <div className="app-surface min-h-screen" data-theme={activeTheme}>
+    <div className="app-surface min-h-screen" data-theme={activeTheme} data-cosmetic={cosmeticStyle}>
       <aside
         className={`desktop-sidebar fixed inset-y-0 left-0 z-40 hidden flex-col overflow-visible border-r border-[var(--sidebar-line)] bg-[var(--sidebar-bg)] text-[var(--sidebar-text)] shadow-[24px_0_70px_rgba(2,18,20,.10)] transition-[width,padding,background-color] duration-500 ease-[cubic-bezier(.22,1,.36,1)] lg:flex ${collapsed ? "w-[92px] px-4 py-6" : "w-[280px] p-6"}`}
       >

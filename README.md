@@ -17,6 +17,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Plano de retomada privado após um recomeço, com reflexão opcional e ações pequenas para as próximas 24 horas.
 - Fluxo SOS com pausa guiada de dez minutos.
 - Aliado opcional com permissões explícitas por dado, diário privado por padrão e pedidos neutros de apoio.
+- Ambientes visuais desbloqueáveis por presença, persistidos no perfil e sem compras, moedas ou pressão.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.
 - Toasts para confirmar inserções, alterações, exclusões e erros.
 - Exportação dos próprios dados e controles de privacidade.

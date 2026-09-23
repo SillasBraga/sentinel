@@ -325,6 +325,101 @@ label:has(> input[type="radio"]:checked) {
     linear-gradient(145deg, #0b2022 0%, #10282a 52%, #0c2224 100%);
 }
 
+.app-surface[data-cosmetic="aurora"] {
+  background:
+    radial-gradient(circle at 15% 18%, rgba(168, 127, 235, .18), transparent 30%),
+    radial-gradient(circle at 88% 28%, rgba(65, 199, 174, .23), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(243, 189, 102, .15), transparent 35%),
+    var(--paper);
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="aurora"] {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(167, 139, 250, .42), transparent 34%),
+    radial-gradient(circle at 88% 20%, rgba(65, 199, 174, .32), transparent 30%),
+    radial-gradient(circle at 48% 100%, rgba(243, 189, 102, .18), transparent 42%),
+    linear-gradient(145deg, #141b35, #102d35 52%, #1e283b);
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="aurora"] .bg-white {
+  background: linear-gradient(145deg, #252b4a, #183f45);
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="aurora"] [class*="bg-white/"] {
+  background-color: rgba(37, 43, 74, .88);
+}
+
+.app-surface[data-cosmetic="constellation"] {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(19, 124, 109, .16) 0 2px, transparent 3px),
+    radial-gradient(circle at 83% 15%, rgba(65, 199, 174, .14) 0 1.5px, transparent 2.5px),
+    linear-gradient(145deg, #edf7f5, #e3f0ee 52%, #eaf6f3);
+  background-size: 210px 210px, 285px 285px, auto;
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="constellation"] {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(113, 219, 198, .36) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 83% 15%, rgba(147, 197, 253, .32) 0 1px, transparent 2px),
+    linear-gradient(145deg, #071d2b, #0c2b36 52%, #101d3a);
+  background-size: 210px 210px, 285px 285px, auto;
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="constellation"] .bg-white {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(113, 219, 198, .14) 0 1px, transparent 2px),
+    linear-gradient(145deg, #123340, #102a3a);
+  background-size: 130px 130px, auto;
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="constellation"] [class*="bg-white/"] {
+  background-color: rgba(16, 42, 58, .9);
+}
+
+.app-surface[data-cosmetic="constellation"]::before {
+  background-image:
+    radial-gradient(circle at 15% 18%, rgba(19, 124, 109, .48) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 78% 25%, rgba(19, 124, 109, .38) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 57% 72%, rgba(19, 124, 109, .35) 0 1px, transparent 1.7px),
+    linear-gradient(135deg, transparent 49.5%, rgba(19, 124, 109, .09) 50%, transparent 50.5%);
+  background-size: 190px 190px, 250px 250px, 310px 310px, 240px 240px;
+  opacity: .56;
+}
+
+.app-surface[data-theme="dark"][data-cosmetic="constellation"]::before {
+  opacity: .38;
+}
+
+.cosmetic-option {
+  border-color: var(--line);
+  background: #f8fbf9;
+}
+
+.cosmetic-option[data-locked="true"] {
+  background: #eef2ef;
+  opacity: .7;
+}
+
+.app-surface[data-theme="dark"] .cosmetic-option {
+  border-color: rgba(225, 247, 241, .13);
+  background: #173638;
+  color: #edf8f5;
+}
+
+.app-surface[data-theme="dark"] .cosmetic-option:has(> input[type="radio"]:checked) {
+  border-color: rgba(113, 219, 198, .48);
+  background: linear-gradient(145deg, #1e504b, #193d3c);
+}
+
+.app-surface[data-theme="dark"] .cosmetic-option > span > span:last-child {
+  color: #82ead5;
+}
+
+.app-surface[data-theme="dark"] .cosmetic-option[data-locked="true"] {
+  background: #10292b;
+  opacity: .72;
+}
+
 .app-surface[data-theme="dark"] .bg-white {
   background-color: #132d2f;
 }

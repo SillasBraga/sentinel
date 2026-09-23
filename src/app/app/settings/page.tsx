@@ -1,17 +1,20 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { deleteAccount, updatePrivacy } from "@/features/settings/actions";
+import { deleteAccount, updateCosmeticStyle, updatePrivacy } from "@/features/settings/actions";
 import { requireUser } from "@/lib/auth";
+import { getCosmeticCollection } from "@/lib/cosmetics";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
   const user = await requireUser();
   const supabase = await createClient();
   const params = await searchParams;
-  const [{ data: profile }, { data: privacy }] = await Promise.all([
-    supabase.from("profiles").select("discreet_mode,hide_sensitive_numbers,spiritual_mode").eq("id", user.id).single(),
-    supabase.from("privacy_preferences").select("personal_analytics,browser_notifications,quick_exit").eq("user_id", user.id).single()
+  const [{ data: profile }, { data: privacy }, { data: xpEvents }] = await Promise.all([
+    supabase.from("profiles").select("discreet_mode,hide_sensitive_numbers,spiritual_mode,cosmetic_style").eq("id", user.id).single(),
+    supabase.from("privacy_preferences").select("personal_analytics,browser_notifications,quick_exit").eq("user_id", user.id).single(),
+    supabase.from("presence_xp_events").select("points").eq("user_id", user.id),
   ]);
+  const cosmetics = getCosmeticCollection((xpEvents ?? []).reduce((total, event) => total + event.points, 0));
 
   return (
     <div className="mx-auto max-w-4xl p-5 py-8 sm:p-8 lg:p-12">
@@ -40,6 +43,25 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </select>
         </label>
         <button className="primary-action min-h-13 rounded-full px-6 font-bold">Salvar preferências</button>
+      </form>
+
+      <form action={updateCosmeticStyle} className="mt-6 rounded-[1.8rem] bg-white p-6 sm:p-8">
+        <h2 className="text-xl font-bold">Ambiente visual</h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Escolha uma aparência que já combina com a sua presença. Não há compras, moedas, caixas aleatórias ou prazo.</p>
+        <fieldset className="mt-5 grid gap-3 sm:grid-cols-3">
+          <legend className="sr-only">Escolha seu ambiente visual</legend>
+          {cosmetics.map((cosmetic) => (
+            <label key={cosmetic.id} className="cosmetic-option grid min-h-44 content-between rounded-2xl border p-4" data-locked={!cosmetic.unlocked}>
+              <input type="radio" name="cosmeticStyle" value={cosmetic.id} defaultChecked={(profile?.cosmetic_style ?? "base") === cosmetic.id} disabled={!cosmetic.unlocked} className="size-5" />
+              <span>
+                <strong className="block">{cosmetic.title}</strong>
+                <span className="mt-2 block text-sm leading-5 text-[var(--muted)]">{cosmetic.description}</span>
+                <span className="mt-3 block text-xs font-bold text-[var(--teal-deep)]">{cosmetic.unlocked ? "Disponível" : `Libera com ${cosmetic.requiredXp} XP de presença`}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+        <button className="primary-action mt-5 min-h-13 rounded-full px-6 font-bold">Aplicar ambiente</button>
       </form>
 
       <section className="mt-6 rounded-[1.8rem] bg-white p-6 sm:p-8">

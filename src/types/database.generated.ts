@@ -669,6 +669,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cosmetic_style: string
           created_at: string
           discreet_mode: boolean
           display_name: string | null
@@ -683,6 +684,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cosmetic_style?: string
           created_at?: string
           discreet_mode?: boolean
           display_name?: string | null
@@ -697,6 +699,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cosmetic_style?: string
           created_at?: string
           discreet_mode?: boolean
           display_name?: string | null

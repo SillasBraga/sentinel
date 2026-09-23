@@ -24,7 +24,7 @@ Os testes em `supabase/tests/rls.sql` verificam isolamento entre contas e permis
 
 ## Dados e eventos
 
-O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e recaídas são eventos. Indicadores como sequência, alinhamento e risco são derivados desses registros. Preferências estáveis ficam no perfil; o tema atual é persistido por usuário.
+O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e recaídas são eventos. Indicadores como sequência, alinhamento e risco são derivados desses registros. Preferências estáveis ficam no perfil; o tema atual e o ambiente visual escolhido são persistidos por usuário. `cosmetic_style` aceita apenas o catálogo local de ambientes e não armazena progresso: os desbloqueios são sempre derivados do histórico imutável de XP de presença.
 
 `relapse_events` também pode guardar o plano de retomada privado do evento: relato do ocorrido, barreira, ação de proteção nas próximas 24 horas e missão leve para amanhã. Todos os campos são opcionais e não entram em XP, missões, sequência ou compartilhamento com accountability.
 

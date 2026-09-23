@@ -56,7 +56,7 @@ O service worker nunca armazena respostas privadas de `/app/*`. A página offlin
 
 ## Interface e tema
 
-O shell responsivo concentra navegação, alternância de tema e viewport de toasts. `Registros` é uma área principal e permanece ativa durante os fluxos de momento, impulso legado e recomeço. Em telas móveis, a barra fixa prioriza Início, Registros, Progresso e SOS; Diário, Perfil e ferramentas secundárias ficam no painel “Mais”. No desktop, a barra lateral reduz espaçamentos conforme a altura disponível para não ocultar ações em notebooks. A preferência de tema é aplicada imediatamente no cliente e persistida no perfil do usuário. CSS variables representam superfícies, texto, bordas e acentos para evitar divergências entre claro/escuro; animações devem respeitar `prefers-reduced-motion`.
+O shell responsivo concentra navegação, alternância de tema e viewport de toasts. `Registros` é uma área principal e permanece ativa durante os fluxos de momento, impulso legado e recomeço. Em telas móveis, a barra fixa prioriza Início, Registros, Progresso e SOS; Diário, Perfil e ferramentas secundárias ficam no painel “Mais”. No desktop, a barra lateral reduz espaçamentos conforme a altura disponível para não ocultar ações em notebooks. A preferência de tema é aplicada imediatamente no cliente e persistida no perfil do usuário. Em Perfil, ambientes visuais são desbloqueados somente por XP acumulado e a preferência é persistida no perfil; não há moedas, compras, caixas aleatórias ou pressão de prazo. CSS variables representam superfícies, texto, bordas e acentos para evitar divergências entre claro/escuro; animações devem respeitar `prefers-reduced-motion`.
 
 ## Evolução
 
