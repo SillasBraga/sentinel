@@ -19,3 +19,4 @@ Todas as mudanças relevantes serão registradas neste arquivo. O formato segue 
 - Plano de retomada privado após recaída, com reflexão opcional, barreira, proteção para 24 horas e missão leve para amanhã.
 - Accountability renomeado para Aliado, com permissões explícitas e mensagens neutras de pedido de apoio.
 - Ambientes visuais Aurora e Constelação desbloqueáveis por XP de presença, sem compras, moedas ou mecânicas de pressão.
+- Navegação reformulada para Base, Jornada, Registrar, SOS e Perfil, com equipamento organizado e missão atual na barra lateral.

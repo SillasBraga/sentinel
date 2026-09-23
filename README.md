@@ -19,6 +19,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Aliado opcional com permissões explícitas por dado, diário privado por padrão e pedidos neutros de apoio.
 - Ambientes visuais desbloqueáveis por presença, persistidos no perfil e sem compras, moedas ou pressão.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.
+- Navegação única: Base, Jornada, Registrar, SOS e Perfil no mobile e desktop; equipamento organizado por rituais, objetivos, mapa, plano e defesas.
 - Toasts para confirmar inserções, alterações, exclusões e erros.
 - Exportação dos próprios dados e controles de privacidade.
 

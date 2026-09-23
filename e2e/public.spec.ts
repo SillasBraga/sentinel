@@ -1,3 +1,35 @@
 import { expect, test } from "@playwright/test";
 test("landing comunica a proposta e abre cadastro",async({page})=>{await page.goto("/");await expect(page.getByRole("heading",{name:/Recupere o controle/i})).toBeVisible();await page.getByRole("link",{name:/Começar gratuitamente/i}).click();await expect(page).toHaveURL(/signup/);await expect(page.getByRole("heading",{name:/Comece com um passo pequeno/i})).toBeVisible()});
-test("SOS permanece disponível na navegação mobile autenticada",async()=>{test.skip(!process.env.E2E_USER_EMAIL,"Requer usuário do seed local")});
+test("navegação privada mantém cinco áreas no mobile",async({page},testInfo)=>{
+  test.skip(!process.env.E2E_USER_EMAIL||!process.env.E2E_USER_PASSWORD,"Requer usuário do seed local");
+  test.skip(testInfo.project.name!=="mobile-safari","Coberto somente no viewport mobile");
+  await page.goto("/login");
+  await page.getByLabel("E-mail").first().fill(process.env.E2E_USER_EMAIL!);
+  await page.getByLabel("Senha").fill(process.env.E2E_USER_PASSWORD!);
+  await page.getByRole("button",{name:"Entrar"}).click();
+  await expect(page).toHaveURL(/app\/dashboard/);
+  const navigation=page.getByRole("navigation",{name:"Navegação principal"});
+  await expect(navigation.getByRole("link",{name:"Base"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"Jornada"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"Registrar"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"SOS"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"Perfil"})).toBeVisible();
+  await navigation.getByRole("link",{name:"SOS"}).click();
+  await expect(page).toHaveURL(/app\/sos/);
+  await expect(page.getByRole("navigation",{name:"Navegação principal"})).toBeVisible();
+});
+test("barra lateral separa navegação e equipamento no desktop",async({page},testInfo)=>{
+  test.skip(!process.env.E2E_USER_EMAIL||!process.env.E2E_USER_PASSWORD,"Requer usuário do seed local");
+  test.skip(testInfo.project.name!=="desktop-chrome","Coberto somente no viewport desktop");
+  await page.goto("/login");
+  await page.getByLabel("E-mail").first().fill(process.env.E2E_USER_EMAIL!);
+  await page.getByLabel("Senha").fill(process.env.E2E_USER_PASSWORD!);
+  await page.getByRole("button",{name:"Entrar"}).click();
+  const navigation=page.getByRole("navigation",{name:"Navegação"});
+  const equipment=page.getByRole("navigation",{name:"Equipamento"});
+  await expect(navigation.getByRole("link",{name:"Base"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"Jornada"})).toBeVisible();
+  await expect(navigation.getByRole("link",{name:"Registrar"})).toBeVisible();
+  await expect(equipment.getByRole("link",{name:"Rituais"})).toBeVisible();
+  await expect(equipment.getByRole("link",{name:"Defesas"})).toBeVisible();
+});

@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { CosmeticStylePicker } from "@/components/cosmetic-style-picker";
 import { PageHeader } from "@/components/page-header";
-import { deleteAccount, updateCosmeticStyle, updatePrivacy } from "@/features/settings/actions";
+import { deleteAccount, updatePrivacy } from "@/features/settings/actions";
 import { requireUser } from "@/lib/auth";
 import { getCosmeticCollection } from "@/lib/cosmetics";
 import { createClient } from "@/lib/supabase/server";
@@ -22,10 +23,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {params.saved && <p className="mt-6 rounded-2xl bg-emerald-50 p-4 text-emerald-800">Preferências salvas.</p>}
       {params.error && <p className="mt-6 rounded-2xl bg-red-50 p-4 text-red-800">{params.error}</p>}
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <Link href="/app/settings/install" className="rounded-[1.4rem] bg-[#d9eee7] p-5 font-bold">Instalar Sentinel →</Link>
-        <Link href="/app/accountability" className="rounded-[1.4rem] bg-white p-5 font-bold">Gerenciar aliado →</Link>
-      </div>
+      <section className="mt-8">
+        <p className="eyebrow text-[var(--teal-deep)]">Sua jornada</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ProfileLink href="/app/habits" label="Rituais" text="Rotinas que fortalecem seu dia." />
+          <ProfileLink href="/app/goals" label="Objetivos" text="Direção sem pressão." />
+          <ProfileLink href="/app/journal" label="Diário" text="Seu espaço continua privado." />
+          <ProfileLink href="/app/plan" label="Plano" text="Gatilhos, motivos e equipamento." />
+          <ProfileLink href="/app/protection" label="Defesas" text="Proteções para ambiente digital." />
+          <ProfileLink href="/app/calendar" label="Mapa" text="Veja registros ao longo do tempo." />
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ProfileLink href="/app/accountability" label="Aliado" text="Apoio opcional com limites claros." />
+          <ProfileLink href="/app/settings/install" label="Instalar Sentinel" text="Leve este espaço para sua tela inicial." />
+        </div>
+      </section>
 
       <form action={updatePrivacy} className="mt-6 grid gap-4 rounded-[1.8rem] bg-white p-6 sm:p-8">
         <h2 className="text-xl font-bold">Aparência e privacidade</h2>
@@ -45,24 +57,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <button className="primary-action min-h-13 rounded-full px-6 font-bold">Salvar preferências</button>
       </form>
 
-      <form action={updateCosmeticStyle} className="mt-6 rounded-[1.8rem] bg-white p-6 sm:p-8">
-        <h2 className="text-xl font-bold">Ambiente visual</h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Escolha uma aparência que já combina com a sua presença. Não há compras, moedas, caixas aleatórias ou prazo.</p>
-        <fieldset className="mt-5 grid gap-3 sm:grid-cols-3">
-          <legend className="sr-only">Escolha seu ambiente visual</legend>
-          {cosmetics.map((cosmetic) => (
-            <label key={cosmetic.id} className="cosmetic-option grid min-h-44 content-between rounded-2xl border p-4" data-locked={!cosmetic.unlocked}>
-              <input type="radio" name="cosmeticStyle" value={cosmetic.id} defaultChecked={(profile?.cosmetic_style ?? "base") === cosmetic.id} disabled={!cosmetic.unlocked} className="size-5" />
-              <span>
-                <strong className="block">{cosmetic.title}</strong>
-                <span className="mt-2 block text-sm leading-5 text-[var(--muted)]">{cosmetic.description}</span>
-                <span className="mt-3 block text-xs font-bold text-[var(--teal-deep)]">{cosmetic.unlocked ? "Disponível" : `Libera com ${cosmetic.requiredXp} XP de presença`}</span>
-              </span>
-            </label>
-          ))}
-        </fieldset>
-        <button className="primary-action mt-5 min-h-13 rounded-full px-6 font-bold">Aplicar ambiente</button>
-      </form>
+      <CosmeticStylePicker cosmetics={cosmetics} selectedStyle={profile?.cosmetic_style === "aurora" || profile?.cosmetic_style === "constellation" ? profile.cosmetic_style : "base"} />
 
       <section className="mt-6 rounded-[1.8rem] bg-white p-6 sm:p-8">
         <h2 className="text-xl font-bold">Seus dados</h2>
@@ -84,4 +79,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
 function Toggle({ name, label, text, checked }: { name: string; label: string; text: string; checked?: boolean }) {
   return <label className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--line)] p-4"><span><strong className="block">{label}</strong><span className="mt-1 block text-sm text-[var(--muted)]">{text}</span></span><input type="checkbox" name={name} defaultChecked={checked} className="size-5" /></label>;
+}
+
+function ProfileLink({ href, label, text }: { href: "/app/habits" | "/app/goals" | "/app/journal" | "/app/plan" | "/app/protection" | "/app/calendar" | "/app/accountability" | "/app/settings/install"; label: string; text: string }) {
+  return <Link href={href} className="group rounded-[1.35rem] border border-[var(--line)] bg-white p-5"><strong className="block">{label} <span className="text-[var(--teal-deep)] transition-transform group-hover:translate-x-1">→</span></strong><span className="mt-2 block text-sm leading-5 text-[var(--muted)]">{text}</span></Link>;
 }
