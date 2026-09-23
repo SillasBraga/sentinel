@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Sora, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 
-const nunito = Nunito({
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-sora",
+  display: "swap"
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
   display: "swap"
 });
 
@@ -17,8 +23,8 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.svg", type: "image/svg+xml" }]
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#07191c", colorScheme: "light dark" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#08111f", colorScheme: "light dark" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pt-BR" className={nunito.variable}><body>{children}<ServiceWorkerRegistration /></body></html>;
+  return <html lang="pt-BR" className={`${sora.variable} ${spaceGrotesk.variable}`}><body>{children}<ServiceWorkerRegistration /></body></html>;
 }

@@ -20,6 +20,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Ambientes visuais desbloqueáveis por presença, persistidos no perfil e sem compras, moedas ou pressão.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.
 - Navegação única: Base, Jornada, Registrar, SOS e Perfil no mobile e desktop; equipamento organizado por rituais, objetivos, mapa, plano e defesas.
+- Central de Jornada com HUD discreto, missão diária, XP, energia, radar de atenção e ações principais sem alterar o histórico privado.
 - Toasts para confirmar inserções, alterações, exclusões e erros.
 - Exportação dos próprios dados e controles de privacidade.
 
