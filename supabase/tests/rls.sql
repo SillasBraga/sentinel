@@ -1,8 +1,9 @@
 begin;
-select plan(11);
+select plan(12);
 select has_table('public','profiles','profiles exists');
 select policies_are('public','journal_entries',array['own journal'],'journal only has owner policy');
 select policies_are('public','daily_checkins',array['own checkins'],'checkins only has owner policy');
+select policies_are('public','relapse_events',array['own relapses'],'relapse plans remain private to their owner');
 select policies_are('public','daily_missions',array['own daily missions'],'daily missions only has owner policy');
 select policies_are('public','daily_focuses',array['own daily focuses'],'daily focuses only have owner policy');
 select policies_are('public','attention_zones',array['own attention zones'],'attention zones only have owner policy');

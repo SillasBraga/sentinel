@@ -16,6 +16,7 @@ import {
   Shield,
   ShieldCheck,
   MoonStar,
+  RotateCcw,
   Sun,
   Target,
   X,
@@ -40,6 +41,7 @@ const nav = [
 
 const tools = [
   { href: "/app/plan", label: "Meu plano", icon: ShieldCheck },
+  { href: "/app/relapse/restart-plan", label: "Retomada", icon: RotateCcw },
   { href: "/app/habits", label: "Hábitos", icon: Dumbbell },
   { href: "/app/goals", label: "Metas", icon: Target },
   { href: "/app/calendar", label: "Calendário", icon: CalendarDays },

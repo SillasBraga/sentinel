@@ -26,6 +26,8 @@ Os testes em `supabase/tests/rls.sql` verificam isolamento entre contas e permis
 
 O modelo privilegia histórico em vez de sobrescrita: check-ins, conclusões e recaídas são eventos. Indicadores como sequência, alinhamento e risco são derivados desses registros. Preferências estáveis ficam no perfil; o tema atual é persistido por usuário.
 
+`relapse_events` também pode guardar o plano de retomada privado do evento: relato do ocorrido, barreira, ação de proteção nas próximas 24 horas e missão leve para amanhã. Todos os campos são opcionais e não entram em XP, missões, sequência ou compartilhamento com accountability.
+
 `daily_missions` mantém o estado resumido das três missões do dia civil do usuário: check-in, ao menos um hábito e um power-up de proteção. A chave primária é `(user_id, local_date)` e o `completed_at` só existe quando as três estão concluídas. Os eventos de check-in e hábito continuam sendo a fonte de histórico; a tabela de missões é um estado de interface persistido.
 
 `daily_focuses` mantém um foco textual por usuário e dia civil, usando o fuso salvo no perfil. O usuário pode revisar ou marcar o foco como concluído durante o dia; ele não gera XP, não é compartilhado e não altera missões ou sequência.

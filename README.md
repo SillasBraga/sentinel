@@ -14,6 +14,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Marcos privados que celebram presença, autocuidado, SOS e recomeços sem competição.
 - Zonas de atenção para desafios recorrentes, com contexto, estratégia de proteção e atalhos para SOS.
 - Power-ups reutilizáveis no menu **Meu plano**, concluíveis uma vez por ação por dia e conectados à missão de proteção.
+- Plano de retomada privado após um recomeço, com reflexão opcional e ações pequenas para as próximas 24 horas.
 - Fluxo SOS com pausa guiada de dez minutos.
 - Convite de accountability com compartilhamento mínimo de informações.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.

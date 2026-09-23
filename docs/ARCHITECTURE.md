@@ -24,6 +24,8 @@ Após um check-in, o usuário é encaminhado ao resultado explicativo, que relac
 
 Na interface, os registros foram consolidados em dois fluxos principais: **momento** (humor, intensidade do impulso, exposição e contexto, persistido em `daily_checkins`) e **recaída/recomeço** (persistido em `relapse_events`). `urges` permanece como histórico compatível para registros detalhados anteriores e continua entrando nos agregados. O SOS é uma intervenção, não um terceiro formulário de registro; sua sessão é persistida automaticamente e passa a alimentar Início, Progresso e Calendário quando concluída.
 
+Após registrar uma recaída, o fluxo abre um plano de retomada privado ligado ao evento. Ele convida a registrar o ocorrido, a barreira que falhou, uma ação para as próximas 24 horas e uma missão leve para amanhã. O último plano permanece acessível em **Retomada**, no menu de ferramentas, e em **Progresso**. As respostas são opcionais, não alteram XP, missões ou sequência e não são compartilhadas por accountability.
+
 Entradas do diário são privadas e podem ser editadas ou excluídas pelo proprietário, sempre com confirmação antes da exclusão. O XP de reflexão, se já concedido, permanece como histórico de presença e não é removido ao alterar ou excluir a nota.
 
 O calendário cruza check-ins, conclusões de hábitos, impulsos, sessões SOS, metas e recomeços pelo fuso horário do perfil. A grade mensal é navegável, inclui filtros locais e exibe apenas resumos no detalhe diário; textos íntimos de recaídas, impulsos e diário não são reproduzidos nessa visão agregada.

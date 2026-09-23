@@ -66,20 +66,51 @@ export async function createUrge(formData: FormData) {
   redirect(parsed.data.intensity >= 7 ? feedback("/app/sos?from=urge", "toast", "Registro salvo. O SOS foi aberto para apoiar você agora.") : feedback("/app/triggers", "toast", "Registro de impulso salvo."));
 }
 
-const relapseSchema = z.object({ occurredAt: z.string().datetime({ local: true }), trigger: z.string().max(1000).optional(), context: z.string().max(120).optional(), learning: z.string().max(2000).optional(), nextStep: z.string().max(1000).optional(), confirmRestart: z.literal("on") }).refine((value) => new Date(value.occurredAt).getTime() <= Date.now() + 60_000, { path: ["occurredAt"], message: "A data da recaída não pode estar no futuro." });
+const relapseSchema = z.object({ occurredAt: z.string().datetime({ local: true }), confirmRestart: z.literal("on") }).refine((value) => new Date(value.occurredAt).getTime() <= Date.now() + 60_000, { path: ["occurredAt"], message: "A data da recaída não pode estar no futuro." });
 
 export async function createRelapse(formData: FormData) {
   const user = await requireUser();
-  const parsed = relapseSchema.safeParse({ occurredAt: formData.get("occurredAt"), trigger: formData.get("trigger") || undefined, context: formData.get("context") || undefined, learning: formData.get("learning") || undefined, nextStep: formData.get("nextStep") || undefined, confirmRestart: formData.get("confirmRestart") });
+  const parsed = relapseSchema.safeParse({ occurredAt: formData.get("occurredAt"), confirmRestart: formData.get("confirmRestart") });
   if (!parsed.success) redirect(feedback("/app/relapse", "error", "Revise a data e confirme o reinício da sequência."));
   const supabase = await createClient();
-  const { error } = await supabase.from("relapse_events").insert({ user_id: user.id, occurred_at: new Date(parsed.data.occurredAt).toISOString(), trigger_summary: parsed.data.trigger, context: parsed.data.context, learning: parsed.data.learning, next_step: parsed.data.nextStep });
-  if (error) redirect(feedback("/app/relapse", "error", "Não foi possível salvar o registro."));
+  const { data, error } = await supabase.from("relapse_events").insert({ user_id: user.id, occurred_at: new Date(parsed.data.occurredAt).toISOString() }).select("id").single();
+  if (error || !data) redirect(feedback("/app/relapse", "error", "Não foi possível salvar o registro."));
   const milestones = await awardPrivateMilestones();
   revalidatePath("/app/dashboard");
   revalidatePath("/app/progress");
   revalidatePath("/app/calendar");
-  redirect(withMilestones(feedback("/app/progress?relapse=1", "toast", "Recaída registrada. Sua sequência recomeçou e o histórico anterior foi preservado."), milestones.success ? milestones.milestoneIds : []));
+  redirect(withMilestones(`/app/relapse/restart-plan?id=${data.id}` as Route, milestones.success ? milestones.milestoneIds : []));
+}
+
+const restartPlanSchema = z.object({
+  relapseId: z.uuid(),
+  whatHappened: z.string().trim().max(2000).optional(),
+  barrier: z.string().trim().max(1000).optional(),
+  next24hAction: z.string().trim().max(1000).optional(),
+  tomorrowMission: z.string().trim().max(500).optional(),
+});
+
+export async function saveRestartPlan(formData: FormData) {
+  const user = await requireUser();
+  const parsed = restartPlanSchema.safeParse({
+    relapseId: formData.get("relapseId"),
+    whatHappened: formData.get("whatHappened") || undefined,
+    barrier: formData.get("barrier") || undefined,
+    next24hAction: formData.get("next24hAction") || undefined,
+    tomorrowMission: formData.get("tomorrowMission") || undefined,
+  });
+  if (!parsed.success) redirect(feedback("/app/relapse", "error", "Revise seu plano de retomada."));
+  const supabase = await createClient();
+  const { error } = await supabase.from("relapse_events").update({
+    restart_what_happened: parsed.data.whatHappened ?? null,
+    restart_barrier: parsed.data.barrier ?? null,
+    restart_next_24h_action: parsed.data.next24hAction ?? null,
+    restart_tomorrow_mission: parsed.data.tomorrowMission ?? null,
+  }).eq("id", parsed.data.relapseId).eq("user_id", user.id);
+  if (error) redirect(feedback(`/app/relapse/restart-plan?id=${parsed.data.relapseId}`, "error", "Não foi possível salvar o plano de retomada."));
+  revalidatePath("/app/dashboard");
+  revalidatePath("/app/progress");
+  redirect(feedback("/app/dashboard", "toast", "Plano de retomada salvo. Um passo de cada vez."));
 }
 
 export async function createHabit(formData: FormData) {

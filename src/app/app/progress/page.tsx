@@ -17,7 +17,7 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
   const [profile, recovery, relapses, checkins, urges, sos, earnedMilestones] = await Promise.all([
     supabase.from("profiles").select("timezone").eq("id", user.id).single(),
     supabase.from("recovery_profiles").select("started_at").eq("user_id", user.id).single(),
-    supabase.from("relapse_events").select("occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }),
+    supabase.from("relapse_events").select("id,occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }),
     supabase.from("daily_checkins").select("urge_level,local_date,occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("urges").select("intensity,occurred_at").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("sos_sessions").select("started_at,initial_intensity,final_intensity").eq("user_id", user.id).eq("completed", true).not("final_intensity", "is", null),
@@ -26,6 +26,7 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
   const now = new Date();
   const timezone = profile.data?.timezone ?? "America/Sao_Paulo";
   const relapseDates = (relapses.data ?? []).map((item) => item.occurred_at);
+  const latestRestart = relapses.data?.[0] ?? null;
   const events = [
     { type: "start" as const, occurredAt: recovery.data?.started_at ?? now.toISOString() },
     ...relapseDates.map((occurredAt) => ({ type: "relapse" as const, occurredAt })),
@@ -71,6 +72,8 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
       <Summary label="Sessões SOS · 30 dias" value={recentSos} />
       <Summary label="Recomeços · 30 dias" value={recentRestarts} />
     </section>
+
+    {latestRestart && <section className="mt-6 flex flex-col gap-4 rounded-[1.6rem] border border-[var(--line)] bg-white/60 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><p className="eyebrow text-[var(--teal-deep)]">Último recomeço</p><h2 className="mt-2 text-xl font-bold">Seu plano de retomada</h2><p className="mt-2 text-sm leading-6 text-[var(--muted)]">Revise ou atualize as ações que ajudam nas próximas horas.</p></div><Link href={`/app/relapse/restart-plan?id=${latestRestart.id}` as never} className="primary-action inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 font-bold">Abrir plano <ArrowRight size={17} /></Link></section>}
 
     <PrivateMilestonesCard milestones={(earnedMilestones.data ?? []).filter((item) => isPrivateMilestoneId(item.achievement_id))} />
 

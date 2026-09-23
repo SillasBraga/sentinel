@@ -774,6 +774,10 @@ export type Database = {
           learning: string | null
           next_step: string | null
           occurred_at: string
+          restart_barrier: string | null
+          restart_next_24h_action: string | null
+          restart_tomorrow_mission: string | null
+          restart_what_happened: string | null
           trigger_summary: string | null
           user_id: string
         }
@@ -785,6 +789,10 @@ export type Database = {
           learning?: string | null
           next_step?: string | null
           occurred_at: string
+          restart_barrier?: string | null
+          restart_next_24h_action?: string | null
+          restart_tomorrow_mission?: string | null
+          restart_what_happened?: string | null
           trigger_summary?: string | null
           user_id: string
         }
@@ -796,6 +804,10 @@ export type Database = {
           learning?: string | null
           next_step?: string | null
           occurred_at?: string
+          restart_barrier?: string | null
+          restart_next_24h_action?: string | null
+          restart_tomorrow_mission?: string | null
+          restart_what_happened?: string | null
           trigger_summary?: string | null
           user_id?: string
         }
