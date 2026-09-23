@@ -361,14 +361,14 @@ export function RecoveryCalendar({
                 <div><strong>Recomeço registrado</strong><span>O histórico permanece inteiro; este dia não apaga os anteriores.</span></div>
               </div>
             )}
-            {(filter === "all" || filter === "goal") && selectedDay.goalsCompleted.map((title) => (
-              <div key={`completed-${title}`} className="calendar-detail-item detail-goal">
+            {(filter === "all" || filter === "goal") && selectedDay.goalsCompleted.map((title, index) => (
+              <div key={`completed-${title}-${index}`} className="calendar-detail-item detail-goal">
                 <Target size={18} />
                 <div><strong>Meta concluída</strong><span>{title}</span></div>
               </div>
             ))}
-            {(filter === "all" || filter === "goal") && selectedDay.goalsDue.map((title) => (
-              <div key={`due-${title}`} className="calendar-detail-item detail-goal">
+            {(filter === "all" || filter === "goal") && selectedDay.goalsDue.map((title, index) => (
+              <div key={`due-${title}-${index}`} className="calendar-detail-item detail-goal">
                 <Target size={18} />
                 <div><strong>Data-alvo da meta</strong><span>{title}</span></div>
               </div>
