@@ -1,6 +1,6 @@
 # Scripts
 
-- `create-demo-user.mjs`: cria ou atualiza a conta de demonstração no Supabase local.
+- `create-demo-user.mjs`: cria ou atualiza contas locais de jornada e aliado no Supabase local.
 
 Execute pelo script npm documentado:
 

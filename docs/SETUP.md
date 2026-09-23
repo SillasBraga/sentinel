@@ -45,10 +45,10 @@ npm run dev
 
 Credenciais locais padrão:
 
-- E-mail: `demo@sentinel.local`
-- Senha: `SentinelDemo2026!`
+- Jornada: `demo@sentinel.local` / `SentinelDemo2026!`
+- Aliado: `ally@sentinel.local` / `AllyDemo2026!`
 
-O script é idempotente e destinado exclusivamente ao projeto Supabase local.
+Use contas em navegadores ou perfis separados para testar convites de Aliado. O script é idempotente e destinado exclusivamente ao projeto Supabase local.
 
 ## 5. URLs locais
 

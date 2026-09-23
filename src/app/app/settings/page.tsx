@@ -21,7 +21,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Link href="/app/settings/install" className="rounded-[1.4rem] bg-[#d9eee7] p-5 font-bold">Instalar Sentinel →</Link>
-        <Link href="/app/accountability" className="rounded-[1.4rem] bg-white p-5 font-bold">Gerenciar accountability →</Link>
+        <Link href="/app/accountability" className="rounded-[1.4rem] bg-white p-5 font-bold">Gerenciar aliado →</Link>
       </div>
 
       <form action={updatePrivacy} className="mt-6 grid gap-4 rounded-[1.8rem] bg-white p-6 sm:p-8">

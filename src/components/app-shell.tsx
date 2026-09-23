@@ -9,6 +9,7 @@ import {
   CircleUserRound,
   ClipboardPlus,
   Dumbbell,
+  HeartHandshake,
   LayoutGrid,
   House,
   LifeBuoy,
@@ -41,6 +42,7 @@ const nav = [
 
 const tools = [
   { href: "/app/plan", label: "Meu plano", icon: ShieldCheck },
+  { href: "/app/accountability", label: "Aliado", icon: HeartHandshake },
   { href: "/app/relapse/restart-plan", label: "Retomada", icon: RotateCcw },
   { href: "/app/habits", label: "Hábitos", icon: Dumbbell },
   { href: "/app/goals", label: "Metas", icon: Target },

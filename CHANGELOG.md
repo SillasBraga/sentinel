@@ -17,3 +17,4 @@ Todas as mudanças relevantes serão registradas neste arquivo. O formato segue 
 - Zonas de atenção editáveis e excluíveis, com frequência, contexto, estratégia e atalhos de apoio.
 - Power-ups cadastráveis em **Meu plano**, reutilizáveis na Base e no plano, com conclusão diária por ação.
 - Plano de retomada privado após recaída, com reflexão opcional, barreira, proteção para 24 horas e missão leve para amanhã.
+- Accountability renomeado para Aliado, com permissões explícitas e mensagens neutras de pedido de apoio.

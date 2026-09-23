@@ -46,9 +46,9 @@ Marcos privados usam o catálogo `achievements` e o histórico imutável `user_a
 
 A sessão é criada ao iniciar e finalizada com intensidade final, duração e estratégias. Se a persistência falhar, o protocolo visual continua disponível. Conteúdo do SOS usa uma motivação e uma atividade cadastradas pelo próprio usuário.
 
-## Accountability
+## Aliado
 
-Convites usam 32 bytes aleatórios. Somente SHA-256 é persistido, com expiração de sete dias e uso único. Permissões ficam em JSONB e diário inicia como `false`. O parceiro não recebe acesso direto irrestrito aos dados; novos snapshots compartilhados devem passar por funções SQL que validem relacionamento ativo e permissão por recurso.
+Convites usam 32 bytes aleatórios. Somente SHA-256 é persistido, com expiração de sete dias e uso único. Permissões ficam em JSONB e diário inicia como `false`. O aliado não recebe acesso direto irrestrito aos dados; novos snapshots compartilhados devem passar por funções SQL que validem relacionamento ativo e permissão por recurso. Pedidos de apoio usam mensagens neutras predefinidas e exigem permissão específica.
 
 ## Offline
 

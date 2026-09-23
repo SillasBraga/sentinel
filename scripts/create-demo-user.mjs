@@ -18,20 +18,25 @@ if (!url || !serviceKey) throw new Error("Configure o Supabase local em .env.loc
 const admin = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const email = "demo@sentinel.local";
 const password = "SentinelDemo2026!";
+const allyEmail = "ally@sentinel.local";
+const allyPassword = "AllyDemo2026!";
 
 const { data: usersPage, error: listError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
 if (listError) throw listError;
-let user = usersPage.users.find((candidate) => candidate.email === email);
+const ensureUser = async (accountEmail, accountPassword, displayName) => {
+  const existing = usersPage.users.find((candidate) => candidate.email === accountEmail);
+  if (!existing) {
+    const { data, error } = await admin.auth.admin.createUser({ email: accountEmail, password: accountPassword, email_confirm: true, user_metadata: { display_name: displayName } });
+    if (error || !data.user) throw error ?? new Error(`Não foi possível criar ${accountEmail}.`);
+    return data.user;
+  }
+  const { data, error } = await admin.auth.admin.updateUserById(existing.id, { password: accountPassword, email_confirm: true, user_metadata: { display_name: displayName } });
+  if (error || !data.user) throw error ?? new Error(`Não foi possível atualizar ${accountEmail}.`);
+  return data.user;
+};
 
-if (!user) {
-  const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { display_name: "Lucas Demo" } });
-  if (error) throw error;
-  user = data.user;
-} else {
-  const { data, error } = await admin.auth.admin.updateUserById(user.id, { password, email_confirm: true });
-  if (error) throw error;
-  user = data.user;
-}
+const user = await ensureUser(email, password, "Lucas Demo");
+const ally = await ensureUser(allyEmail, allyPassword, "Aliado Demo");
 
 const userId = user.id;
 const now = new Date();
@@ -50,6 +55,7 @@ const must = async (promise) => {
 };
 
 await must(admin.from("profiles").update({ display_name: "Lucas Demo", timezone: "America/Sao_Paulo", onboarding_completed: true, discreet_mode: false, hide_sensitive_numbers: false }).eq("id", userId));
+await must(admin.from("profiles").update({ display_name: "Aliado Demo", timezone: "America/Sao_Paulo", onboarding_completed: true, discreet_mode: false, hide_sensitive_numbers: false }).eq("id", ally.id));
 await must(admin.from("recovery_profiles").upsert({ user_id: userId, started_at: isoDaysAgo(21, 8), goals: ["Recuperar o controle", "Melhorar foco e energia"], current_frequency: "Algumas vezes por semana", risk_start: "22:00", risk_end: "01:00", motivations: "Quero estar mais presente, recuperar meu foco e construir relacionamentos melhores.", accountability_preference: "later", checkin_time: "20:00", reminders_enabled: true }));
 await must(admin.from("privacy_preferences").upsert({ user_id: userId, personal_analytics: true, browser_notifications: false, quick_exit: true }));
 
@@ -94,6 +100,6 @@ await must(admin.from("habits").upsert([
 await must(admin.from("habit_logs").upsert(Array.from({ length: 6 }, (_, day) => ({ id: `90000000-0000-4000-8000-${String(day + 1).padStart(12, "0")}`, habit_id: day % 2 === 0 ? "80000000-0000-4000-8000-000000000001" : "80000000-0000-4000-8000-000000000002", user_id: userId, local_date: localDate(day) })), { onConflict: "id" }));
 await must(admin.from("goals").upsert({ id: "a0000000-0000-4000-8000-000000000001", user_id: userId, title: "Completar 14 dias com escolhas conscientes", target_date: localDate(-7) }, { onConflict: "id" }));
 
-console.log("Usuário demo pronto:");
-console.log(`E-mail: ${email}`);
-console.log(`Senha: ${password}`);
+console.log("Contas demo prontas:");
+console.log(`Jornada: ${email} / ${password}`);
+console.log(`Aliado: ${allyEmail} / ${allyPassword}`);

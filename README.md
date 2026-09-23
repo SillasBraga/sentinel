@@ -16,7 +16,7 @@ Plataforma web e PWA de apoio à recuperação e à construção de hábitos sau
 - Power-ups reutilizáveis no menu **Meu plano**, concluíveis uma vez por ação por dia e conectados à missão de proteção.
 - Plano de retomada privado após um recomeço, com reflexão opcional e ações pequenas para as próximas 24 horas.
 - Fluxo SOS com pausa guiada de dez minutos.
-- Convite de accountability com compartilhamento mínimo de informações.
+- Aliado opcional com permissões explícitas por dado, diário privado por padrão e pedidos neutros de apoio.
 - Tema claro/escuro persistido por usuário e interface responsiva/PWA.
 - Toasts para confirmar inserções, alterações, exclusões e erros.
 - Exportação dos próprios dados e controles de privacidade.
@@ -70,7 +70,7 @@ Com o Supabase local em execução e `.env.local` configurado:
 npm run db:demo
 ```
 
-Por padrão, o script cria `demo@sentinel.local` com a senha `SentinelDemo2026!`. Essas credenciais são apenas para desenvolvimento local; nunca devem ser usadas em produção.
+Por padrão, o script cria duas contas locais: `demo@sentinel.local` com a senha `SentinelDemo2026!` e `ally@sentinel.local` com a senha `AllyDemo2026!`. Use a primeira para a jornada e a segunda para testar convites de Aliado. Essas credenciais são apenas para desenvolvimento local; nunca devem ser usadas em produção.
 
 ## Variáveis de ambiente
 
